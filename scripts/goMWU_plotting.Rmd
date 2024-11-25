@@ -56,13 +56,31 @@ ress_filt <- ress %>%
 
 Plot to assess delta rank correlation between shared BP GO terms
 ```{r}
+# bp_plot <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y)) +
+#   geom_point(size = 2.5, show.legend = F) +
+#   geom_text_repel(data = ress_filt, aes(), segment.alpha = 1, box.padding = 1, direction = "both", max.overlaps = Inf, size = 3, force = 3) +
+#   scale_size("size") +
+#   labs(x = "Delta Rank (High v. Control)", y = "Delta Rank (High v. Mid)") +
+#   geom_vline(xintercept = 0, linetype = 2, alpha = 0.75) +
+#   geom_hline(yintercept = 0, linetype = 2, alpha = 0.75) +
+#   theme_cowplot(); bp_plot
+
+# Adjust text size and increase repulsion
 bp_plot <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y)) +
-  geom_point(size = 2.5, show.legend = F) +
-  geom_text_repel(data = ress_filt, aes(), segment.alpha = 1, box.padding = 0.7, direction = "both", max.overlaps = 15) +
+  geom_point(size = 2.5, show.legend = FALSE) +
+  geom_text_repel(
+    segment.alpha = 1,
+    box.padding = 0.7,
+    direction = "both",
+    max.overlaps = Inf, # Allow more overlaps but control with point.size
+    size = 3, # Reduce text size
+    force = 2, # Increase repulsion force
+    max.iter = 1000 # Increase iterations for better placement
+  ) +
   scale_size("size") +
   labs(x = "Delta Rank (High v. Control)", y = "Delta Rank (High v. Mid)") +
-  geom_vline(xintercept = 0, linetype = 2, alpha = 0.75) +
-  geom_hline(yintercept = 0, linetype = 2, alpha = 0.75) +
+  geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.75) +
+  geom_hline(yintercept = 0, linetype = "dashed", alpha = 0.75) +
   theme_cowplot(); bp_plot
 ```
 
@@ -106,7 +124,15 @@ Plot to assess delta rank correlation between shared CC GO terms
 ```{r}
 cc_plot <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y)) +
   geom_point(size = 2.5, show.legend = F) +
-  geom_text_repel(data = ress_filt, aes(), segment.alpha = 1, box.padding = 0.7, direction = "both", max.overlaps = 10) +
+  geom_text_repel(
+    segment.alpha = 1,
+    box.padding = 0.7,
+    direction = "both",
+    max.overlaps = Inf, # Allow more overlaps but control with point.size
+    size = 3, # Reduce text size
+    force = 2, # Increase repulsion force
+    max.iter = 1000 # Increase iterations for better placement
+  ) +
   scale_size("size") +
   labs(x = "Delta Rank (High v. Control)", y = "Delta Rank (High v. Mid)") +
   geom_vline(xintercept = 0, linetype = 2, alpha = 0.75) +
@@ -154,7 +180,15 @@ Plot to assess delta rank correlation between shared MF GO terms
 ```{r}
 mf_plot <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y)) +
   geom_point(size = 2.5, show.legend = F) +
-  geom_text_repel(data = ress_filt, aes(), segment.alpha = 1, box.padding = 0.7, direction = "both", max.overlaps = 15) +
+  geom_text_repel(
+    segment.alpha = 1,
+    box.padding = 0.7,
+    direction = "both",
+    max.overlaps = Inf, # Allow more overlaps but control with point.size
+    size = 3, # Reduce text size
+    force = 2, # Increase repulsion force
+    max.iter = 1000 # Increase iterations for better placement
+  ) +
   scale_size("size") +
   labs(x = "Delta Rank (High v. Control)", y = "Delta Rank (High v. Mid)") +
   geom_vline(xintercept = 0, linetype = 2, alpha = 0.75) +
@@ -213,7 +247,15 @@ Plot to assess delta rank correlation between shared BP GO terms
 ```{r}
 bp_plot <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y)) +
   geom_point(size = 2.5, show.legend = F) +
-  geom_text_repel(data = ress_filt, aes(), segment.alpha = 1, box.padding = 0.7, direction = "both", max.overlaps = 15) +
+  geom_text_repel(
+    segment.alpha = 1,
+    box.padding = 0.7,
+    direction = "both",
+    max.overlaps = Inf, # Allow more overlaps but control with point.size
+    size = 3, # Reduce text size
+    force = 2, # Increase repulsion force
+    max.iter = 1000 # Increase iterations for better placement
+  ) +
   scale_size("size") +
   labs(x = "Delta Rank (High v. Control)", y = "Delta Rank (Mid v. Control)") +
   geom_vline(xintercept = 0, linetype = 2, alpha = 0.75) +
@@ -261,7 +303,15 @@ Plot to assess delta rank correlation between shared CC GO terms
 ```{r}
 cc_plot <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y)) +
   geom_point(size = 2.5, show.legend = F) +
-  geom_text_repel(data = ress_filt, aes(), segment.alpha = 1, box.padding = 0.7, direction = "both", max.overlaps = 11) +
+  geom_text_repel(
+    segment.alpha = 1,
+    box.padding = 0.7,
+    direction = "both",
+    max.overlaps = Inf, # Allow more overlaps but control with point.size
+    size = 3, # Reduce text size
+    force = 2, # Increase repulsion force
+    max.iter = 1000 # Increase iterations for better placement
+  ) +
   scale_size("size") +
   labs(x = "Delta Rank (High v. Control)", y = "Delta Rank (Mid v. Control)") +
   geom_vline(xintercept = 0, linetype = 2, alpha = 0.75) +
@@ -309,7 +359,15 @@ Plot to assess delta rank correlation between shared MF GO terms
 ```{r}
 mf_plot <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y)) +
   geom_point(size = 2.5, show.legend = F) +
-  geom_text_repel(data = ress_filt, aes(), segment.alpha = 1, box.padding = 0.7, direction = "both", max.overlaps = 15) +
+  geom_text_repel(
+    segment.alpha = 1,
+    box.padding = 0.7,
+    direction = "both",
+    max.overlaps = Inf, # Allow more overlaps but control with point.size
+    size = 3, # Reduce text size
+    force = 2, # Increase repulsion force
+    max.iter = 1000 # Increase iterations for better placement
+  ) +
   scale_size("size") +
   labs(x = "Delta Rank (High v. Control)", y = "Delta Rank (Mid v. Control)") +
   geom_vline(xintercept = 0, linetype = 2, alpha = 0.75) +
@@ -369,7 +427,15 @@ Plot to assess delta rank correlation between shared BP GO terms
 ```{r}
 bp_plot <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y)) +
   geom_point(size = 2.5, show.legend = F) +
-  geom_text_repel(data = ress_filt, aes(), segment.alpha = 1, box.padding = 0.7, direction = "both", max.overlaps = 15) +
+  geom_text_repel(
+    segment.alpha = 1,
+    box.padding = 0.7,
+    direction = "both",
+    max.overlaps = Inf, # Allow more overlaps but control with point.size
+    size = 3, # Reduce text size
+    force = 2, # Increase repulsion force
+    max.iter = 1000 # Increase iterations for better placement
+  ) +
   scale_size("size") +
   labs(x = "Delta Rank (High v. Mid)", y = "Delta Rank (Mid v. Control)") +
   geom_vline(xintercept = 0, linetype = 2, alpha = 0.75) +
@@ -418,7 +484,15 @@ Plot to assess delta rank correlation between shared CC GO terms
 ```{r}
 cc_plot <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y)) +
   geom_point(size = 2.5, show.legend = F) +
-  geom_text_repel(data = ress_filt, aes(), segment.alpha = 1, box.padding = 0.7, direction = "both", max.overlaps = 10) +
+  geom_text_repel(
+    segment.alpha = 1,
+    box.padding = 0.7,
+    direction = "both",
+    max.overlaps = Inf, # Allow more overlaps but control with point.size
+    size = 3, # Reduce text size
+    force = 2, # Increase repulsion force
+    max.iter = 1000 # Increase iterations for better placement
+  ) +
   scale_size("size") +
   labs(x = "Delta Rank (High v. Mid)", y = "Delta Rank (Mid v. Control)") +
   geom_vline(xintercept = 0, linetype = 2, alpha = 0.75) +
@@ -466,7 +540,15 @@ Plot to assess delta rank correlation between shared CC GO terms
 ```{r}
 mf_plot <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y)) +
   geom_point(size = 2.5, show.legend = F) +
-  geom_text_repel(data = ress_filt, aes(), segment.alpha = 1, box.padding = 0.7, direction = "both", max.overlaps = 15) +
+  geom_text_repel(
+    segment.alpha = 1,
+    box.padding = 0.7,
+    direction = "both",
+    max.overlaps = Inf, # Allow more overlaps but control with point.size
+    size = 3, # Reduce text size
+    force = 2, # Increase repulsion force
+    max.iter = 1000 # Increase iterations for better placement
+  ) +
   scale_size("size") +
   labs(x = "Delta Rank (High v. Mid)", y = "Delta Rank (Mid v. Control)") +
   geom_vline(xintercept = 0, linetype = 2, alpha = 0.75) +
