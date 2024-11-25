@@ -12,7 +12,7 @@ This electronic notebook provides the data and scripts employed to analyze the m
 ### Contents 
 
 - `Metadata` contains metadata for samples and water collections, as well as _Pocillopora acuta_ genome annotations. 
-- `Raw_data` contains raw data from Apex, Hobo loggers, total alkalinity, tris calibrations and daily water quality measurements. It also contains information on the biomineralization toolkit and the NCBI upload for this dataset. 
+- `Raw_data` contains raw data from Apex, Hobo loggers, total alkalinity, tris calibrations, daily water quality measurements and larval counts for survivorship and settlement. It also contains information on the biomineralization toolkit and the NCBI upload for this dataset. 
 - `output` contains data summaries or data generated through analysis. It also includes data visualization figures. 
 - `scripts` contains .R or .Rmd script documents. It also contains a folder (`GO_MWU`) which contains all GO_MWU scripts, inputs, and outputs. 
 - `Hawaii2022_pH_Temp_Pacu.Rproj` is the R project for the github repository. 
