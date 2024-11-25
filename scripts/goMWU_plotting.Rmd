@@ -166,8 +166,8 @@ Make plots into one figure and save
 ```{r}
 plot <- plot_grid(bp_plot, mf_plot, labels = c('A', 'B'))
 
-ggsave("../output/GO_MWU/HighvControl_HighvMid_DeltaRank.pdf", plot = last_plot(), width = 40, height = 20, units = "cm")
-ggsave("../output/GO_MWU/HighvControl_HighvMid_DeltaRank.png", plot = last_plot(), width = 40, height = 20, units = "cm")
+ggsave("../output/GO_MWU/HighvControl_HighvMid_DeltaRank.pdf", plot = plot, width = 50, height = 35, units = "cm")
+ggsave("../output/GO_MWU/HighvControl_HighvMid_DeltaRank.png", plot = plot, width = 50, height = 35, units = "cm")
 ```
 
 
@@ -321,8 +321,8 @@ Make plots into one figure and save
 ```{r}
 plot <- plot_grid(bp_plot, mf_plot, labels = c('A', 'B'))
 
-ggsave("../output/GO_MWU/HighvControl_MidvControl_DeltaRank.pdf", plot = last_plot(), width = 40, height = 20, units = "cm")
-ggsave("../output/GO_MWU/HighvControl_MidvControl_DeltaRank.png", plot = last_plot(), width = 40, height = 20, units = "cm")
+ggsave("../output/GO_MWU/HighvControl_MidvControl_DeltaRank.pdf", plot = plot, width = 50, height = 35, units = "cm")
+ggsave("../output/GO_MWU/HighvControl_MidvControl_DeltaRank.png", plot = plot, width = 50, height = 35, units = "cm")
 ```
 
 
@@ -478,8 +478,8 @@ Make plots into one figure and save
 ```{r}
 plot <- plot_grid(bp_plot, mf_plot, labels = c('A', 'B'))
 
-ggsave("../output/GO_MWU/HighvMid_MidvControl_DeltaRank.pdf", plot = last_plot(), width = 40, height = 20, units = "cm")
-ggsave("../output/GO_MWU/HighvMid_MidvControl_DeltaRank.png", plot = last_plot(), width = 40, height = 20, units = "cm")
+ggsave("../output/GO_MWU/HighvMid_MidvControl_DeltaRank.pdf", plot = plot, width = 50, height = 35, units = "cm")
+ggsave("../output/GO_MWU/HighvMid_MidvControl_DeltaRank.png", plot = plot, width = 50, height = 35, units = "cm")
 ```
 
 Make plot with comparisons for manuscript
