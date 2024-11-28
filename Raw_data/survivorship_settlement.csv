@@ -1,0 +1,37 @@
+variable;condition;chamber;count
+swimming larvae;control;1;5
+swimming larvae;control;2;4
+swimming larvae;control;3;4
+swimming larvae;mid;1;3
+swimming larvae;mid;2;3
+swimming larvae;mid;3;4
+swimming larvae;high;1;3
+swimming larvae;high;2;3
+swimming larvae;high;3;2
+settlers;control;1;16
+settlers;control;2;17
+settlers;control;3;16
+settlers;mid;1;15
+settlers;mid;2;16
+settlers;mid;3;17
+settlers;high;1;14
+settlers;high;2;14
+settlers;high;3;13
+survived (swimming + settlers);control;1;21
+survived (swimming + settlers);control;2;21
+survived (swimming + settlers);control;3;20
+survived (swimming + settlers);mid;1;18
+survived (swimming + settlers);mid;2;19
+survived (swimming + settlers);mid;3;21
+survived (swimming + settlers);high;1;17
+survived (swimming + settlers);high;2;17
+survived (swimming + settlers);high;3;15
+settle capacity;control;1;0.76
+settle capacity;control;2;0.81
+settle capacity;control;3;0.80
+settle capacity;mid;1;0.83
+settle capacity;mid;2;0.84
+settle capacity;mid;3;0.81
+settle capacity;high;1;0.82
+settle capacity;high;2;0.82
+settle capacity;high;3;0.87
