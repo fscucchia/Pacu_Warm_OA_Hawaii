@@ -14,6 +14,10 @@ library(tidyverse)
 library(ggrepel)
 library(cowplot)
 library(kableExtra)
+library(BiocManager)
+#library("GOSim")
+library(rrvgo)
+library(org.Ce.eg.db)
 ```
 
 ### Delta rank of the shared GO terms between High v Control and High v Mid. 
@@ -583,5 +587,248 @@ kbl(comparisons_table) %>%
   row_spec(0, bold = T) #%>%
   #save_kable("../output/GO_MWU/comparison_table.pdf")
 ```
+
+
+
+Trying to create a new plot 
+
+Hollie ideas: put all 4 of the plots of the delta ranks together in a matrix form, and then either color code the dots if few functions, or we will have to make some lists of only the conserved + and - DR High vs Mid compared to High Vs Control 
+
+```{r}
+#Reduce/collapse GO term set with the rrvgo package 
+      simMatrix <- calculateSimMatrix(bp_hvc_filt$term,
+                                orgdb="org.Ce.eg.db", #c. elegans database
+                                ont=c("BP"),
+                                method="Rel")
+```
+^^ come back to this 
+
+
+Remake plots for manuscript so that the x and y axes have the same number and the dots aren't labeled 
+```{r}
+# Set 1 
+### BP 
+set1_bp <- merge(bp_hvc_filt, bp_mvc_filt, by = "term") # The x is High v Control and the y is Mid v Control  
+set1_bp_filt <- set1_bp %>%
+  dplyr::filter(p.adj.x < 0.01) %>%
+  dplyr::filter(p.adj.y < 0.01) %>%
+  dplyr::filter(!grepl("obsolete", name.x))
+
+# Calculate top positive delta ranks
+top_ranks <- set1_bp_filt %>%
+  filter(delta.rank.x > 0 & delta.rank.y > 0) %>%
+  arrange(desc(delta.rank.x + delta.rank.y)) %>%
+  head(7) %>%
+  pull(name.y)  # Get only the names for the label
+
+# Create a string for the label
+top_ranks_label <- paste(top_ranks, collapse = "\n")
+
+# Create a data frame for the label position
+label_data <- data.frame(
+  x = 1750, # Adjust x position as needed
+  y = 2000, # Adjust y position as needed
+  label = top_ranks_label
+)
+
+# Calculate top negative delta ranks
+neg_ranks <- set1_bp_filt %>%
+  filter(delta.rank.x < 0 & delta.rank.y < 0) %>%
+  arrange(desc(delta.rank.x + delta.rank.y)) %>%
+  head(7) %>%
+  pull(name.y)  # Get only the names for the label
+
+# Create a string for the label
+neg_ranks_label <- paste(neg_ranks, collapse = "\n")
+
+# Create a data frame for the label position
+neg_label_data <- data.frame(
+  x = -2500, # Adjust x position as needed
+  y = -500, # Adjust y position as needed
+  label = neg_ranks_label
+)
+
+# Plot
+plot1 <- ggplot(set1_bp_filt, aes(delta.rank.x, delta.rank.y, label = name.y)) +
+  geom_point(size = 2, show.legend = FALSE) +
+  scale_size("size") +
+  #scale_x_continuous(limits = c(-2500, 2000), breaks = seq(-2000, 2000, 1000)) +
+  #scale_y_continuous(limits = c(-2000, 2400), breaks = seq(-2000, 2000, 1000)) +
+  labs(x = "Delta Rank (High v. Control)", y = "Delta Rank (Mid v. Control)") +
+  geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.75) +
+  geom_hline(yintercept = 0, linetype = "dashed", alpha = 0.75) +
+  geom_label_repel(
+    data = label_data,
+    aes(x = x, y = y, label = label),
+    box.padding = unit(1, "lines"),
+    point.padding = unit(0.5, "lines"),
+    size = 2,
+    color = "black", # Text color
+    fill = "white", # Background color of the label
+    segment.color = NA) + # No line segment needed here
+  geom_label_repel(
+    data = neg_label_data,
+    aes(x = x, y = y, label = label),
+    box.padding = unit(1, "lines"),
+    point.padding = unit(0.5, "lines"),
+    size = 2,
+    color = "black", # Text color
+    fill = "white", # Background color of the label
+    segment.color = NA) + # No line segment needed here
+  theme(axis.text = element_text(size = 50),
+        axis.title = element_text(size = 70)) +
+  theme_cowplot(); plot1
+
+ggsave("../output/GO_MWU/HighvControl_MidvControl_BP_DeltaRank_boxlabel.pdf", plot = plot1, width = 20, height = 15, units = "cm")
+ggsave("../output/GO_MWU/HighvControl_MidvControl_BP_DeltaRank_boxlabel.png", plot = plot1, width = 20, height = 15, units = "cm")
+```
+
+
+
+
+Plots not matching... 
+
+
+
+
+
+
+
+Read in BP data. 
+```{r}
+bp_hvc=read.table("GO_MWU/MWU_BP_DE_High_v_Control_LFC.csv",header=T)
+bp_hvm=read.table("GO_MWU/MWU_BP_DE_High_v_Mid_LFC.csv",header=T)
+```
+
+Find terms in both sets and filter both sets by shared terms. 
+```{r}
+bp_good <- intersect(bp_hvc$term, bp_hvm$term)
+
+# Filter sets
+bp_hvc_filt <- bp_hvc[bp_hvc$term %in% bp_good,]
+bp_hvm_filt <- bp_hvm[bp_hvm$term %in% bp_good,]
+```
+
+There are 5751 shared GO terms between the High v Control and High v Mid comparisons
+
+Combine sets 
+```{r}
+ress <- merge(bp_hvc_filt, bp_hvm_filt, by = "term")
+```
+
+The x is High v Control and the y is High v Mid. 
+
+Filter so that only p.adj < 0.01 for both sets
+```{r}
+ress_filt <- ress %>%
+  dplyr::filter(p.adj.x < 0.01) %>%
+  dplyr::filter(p.adj.y < 0.01) %>%
+  dplyr::filter(!grepl("obsolete", name.x)) %>%
+  arrange(desc(delta.rank.x - delta.rank.y))
+```
+
+Pull most significant delta ranks
+```{r}
+head(ress_filt)
+tail(ress_filt)
+```
+
+Use info from head and tail to make text boxes--also maybe arrange in a different way?  
+
+
+Plot before calculating positive and neg delta ranks 
+```{r}
+bp_plot <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y)) +
+  geom_point(size = 2.5, show.legend = FALSE) +
+  geom_text_repel(
+    segment.alpha = 1,
+    box.padding = 0.7,
+    direction = "both",
+    max.overlaps = 20, # Allow more overlaps but control with point.size
+    size = 3, # Reduce text size
+    force = 2 # Increase repulsion force
+  ) +
+  scale_size("size") +
+  labs(x = "Delta Rank (High v. Control)", y = "Delta Rank (High v. Mid)") +
+  geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.75) +
+  geom_hline(yintercept = 0, linetype = "dashed", alpha = 0.75) +
+  theme_cowplot(); bp_plot
+```
+
+
+Positive delta ranks
+```{r}
+# Calculate top positive delta ranks
+top_ranks <- ress_filt %>%
+  filter(delta.rank.x > 0 & delta.rank.y > 0) %>%
+  arrange(desc(delta.rank.x + delta.rank.y)) %>%
+  head(7) %>%
+  pull(name.y)  # Get only the names for the label
+
+# Create a string for the label
+top_ranks_label <- paste(top_ranks, collapse = "\n")
+
+# Create a data frame for the label position
+label_data <- data.frame(
+  x = 1750, # Adjust x position as needed
+  y = 2000, # Adjust y position as needed
+  label = top_ranks_label
+)
+```
+
+Negative delta ranks 
+```{r}
+# Calculate top negative delta ranks
+neg_ranks <- ress_filt %>%
+  filter(delta.rank.x < 0 & delta.rank.y < 0) %>%
+  arrange(desc(delta.rank.x + delta.rank.y)) %>%
+  head(7) %>%
+  pull(name.y)  # Get only the names for the label
+
+# Create a string for the label
+neg_ranks_label <- paste(neg_ranks, collapse = "\n")
+
+# Create a data frame for the label position
+neg_label_data <- data.frame(
+  x = -2500, # Adjust x position as needed
+  y = -500, # Adjust y position as needed
+  label = neg_ranks_label
+)
+```
+
+```{r}
+# Plot
+plot1 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y)) +
+  geom_point(size = 2, show.legend = FALSE) +
+  scale_size("size") +
+  scale_x_continuous(limits = c(-2500, 2000), breaks = seq(-2000, 2000, 1000)) +
+  scale_y_continuous(limits = c(-2000, 2400), breaks = seq(-2000, 2000, 1000)) +
+  labs(x = "Delta Rank (High v. Control)", y = "Delta Rank (Mid v. Control)") +
+  geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.75) +
+  geom_hline(yintercept = 0, linetype = "dashed", alpha = 0.75) +
+  geom_label_repel(
+    data = label_data,
+    aes(x = x, y = y, label = label),
+    box.padding = unit(1, "lines"),
+    point.padding = unit(0.5, "lines"),
+    size = 2,
+    color = "black", # Text color
+    fill = "white", # Background color of the label
+    segment.color = NA) + # No line segment needed here
+  geom_label_repel(
+    data = neg_label_data,
+    aes(x = x, y = y, label = label),
+    box.padding = unit(1, "lines"),
+    point.padding = unit(0.5, "lines"),
+    size = 2,
+    color = "black", # Text color
+    fill = "white", # Background color of the label
+    segment.color = NA) + # No line segment needed here
+  theme(axis.text = element_text(size = 50),
+        axis.title = element_text(size = 70)) +
+  theme_cowplot(); plot1
+```
+
+
 
 
