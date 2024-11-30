@@ -590,22 +590,7 @@ kbl(comparisons_table) %>%
 
 
 
-Trying to create a new plot 
-
-Hollie ideas: put all 4 of the plots of the delta ranks together in a matrix form, and then either color code the dots if few functions, or we will have to make some lists of only the conserved + and - DR High vs Mid compared to High Vs Control 
-
-```{r}
-#Reduce/collapse GO term set with the rrvgo package 
-      simMatrix <- calculateSimMatrix(bp_hvc_filt$term,
-                                orgdb="org.Ce.eg.db", #c. elegans database
-                                ont=c("BP"),
-                                method="Rel")
-```
-^^ come back to this 
-
-
-Remake plots for manuscript so that the x and y axes have the same number and the dots aren't labeled 
-
+Remaking manuscript figs so that there are not so many labels on the plots and each point isn't individually labeled 
 
 ## High v Control and High v Mid 
 
