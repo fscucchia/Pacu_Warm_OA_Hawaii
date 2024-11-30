@@ -16,8 +16,8 @@ library(cowplot)
 library(kableExtra)
 library(BiocManager)
 #library("GOSim")
-library(rrvgo)
-library(org.Ce.eg.db)
+#library(rrvgo)
+#library(org.Ce.eg.db)
 ```
 
 ### Delta rank of the shared GO terms between High v Control and High v Mid. 
@@ -682,8 +682,8 @@ Color points to be labeled on plot
 ```{r}
 ress_filt <- ress_filt %>%
   mutate(include = case_when(
-    str_detect(name.x, "single strand break repair|G-quadruplex DNA unwinding|V(D)J recombination|negative regulation of telomere capping|mRNA.*3'-splice.*recognition") |
-    str_detect(name.y, "single strand break repair|G-quadruplex DNA unwinding|V(D)J recombination|negative regulation of telomere capping|mRNA.*3'-splice.*recognition") ~ "enriched",
+    str_detect(name.x, "single strand break repair|G-quadruplex DNA unwinding|V\\(D\\)J recombination|negative regulation of telomere capping|mRNA.*3'-splice.*recognition") |
+    str_detect(name.y, "single strand break repair|G-quadruplex DNA unwinding|V\\(D\\)J recombination|negative regulation of telomere capping|mRNA.*3'-splice.*recognition") ~ "enriched",
     str_detect(name.x, "lipoxygenase pathway|axonemal dynein complex assembly|long-chain fatty acid biosynthetic process|fatty acid beta-oxidation|NAD metabolic process|cobalamin metabolic process") |
     str_detect(name.y, "lipoxygenase pathway|axonemal dynein complex assembly|long-chain fatty acid biosynthetic process|fatty acid beta-oxidation|NAD metabolic process|cobalamin metabolic process") ~ "under",
     
@@ -709,9 +709,8 @@ plot1 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color
     box.padding = unit(1, "lines"),
     point.padding = unit(0.5, "lines"),
     size = 2.5,
-    color = "black", # Text color
+    color = "red", # Text color
     fill = "white", # Background color of the label
-    label.border.color = "red",
     segment.color = NA) + # No line segment needed here
   geom_label_repel(
     data = under_label_data,
@@ -719,9 +718,8 @@ plot1 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color
     box.padding = unit(1, "lines"),
     point.padding = unit(0.5, "lines"),
     size = 2.5,
-    color = "black", # Text color
+    color = "blue", # Text color
     fill = "white", # Background color of the label
-    label.border.color = "blue",
     segment.color = NA) + # No line segment needed here
   #annotate("text", label = "R^2 = 0.9702", x = 2200, y = -2300, size = 2, color = "black", parse = T)+
   #annotate("text", label = "p < 0.001", x = 2200, y = -2500, size = 2, color = "black", parse = T)+
@@ -850,7 +848,7 @@ plot2 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color
     box.padding = unit(1, "lines"),
     point.padding = unit(0.5, "lines"),
     size = 2.5,
-    color = "black", # Text color
+    color = "red", # Text color
     fill = "white", # Background color of the label
     segment.color = NA) + # No line segment needed here
   geom_label_repel(
@@ -859,7 +857,7 @@ plot2 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color
     box.padding = unit(1, "lines"),
     point.padding = unit(0.5, "lines"),
     size = 2.5,
-    color = "black", # Text color
+    color = "blue", # Text color
     fill = "white", # Background color of the label
     segment.color = NA) + # No line segment needed here
   #annotate("text", label = "R^2 = 0.8884", x = 2200, y = -2300, size = 2, color = "black", parse = T)+
@@ -998,7 +996,7 @@ plot3 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color
     box.padding = unit(1, "lines"),
     point.padding = unit(0.5, "lines"),
     size = 2.5,
-    color = "black", # Text color
+    color = "red", # Text color
     fill = "white", # Background color of the label
     segment.color = NA) + # No line segment needed here
   geom_label_repel(
@@ -1007,7 +1005,7 @@ plot3 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color
     box.padding = unit(1, "lines"),
     point.padding = unit(0.5, "lines"),
     size = 2.5,
-    color = "black", # Text color
+    color = "blue", # Text color
     fill = "white", # Background color of the label
     segment.color = NA) + # No line segment needed here
   #annotate("text", label = "R^2 = 0.7201", x = 2200, y = -2300, size = 2, color = "black", parse = T)+
@@ -1138,7 +1136,7 @@ plot4 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color
     box.padding = unit(1, "lines"),
     point.padding = unit(0.5, "lines"),
     size = 2.5,
-    color = "black", # Text color
+    color = "red", # Text color
     fill = "white", # Background color of the label
     segment.color = NA) + # No line segment needed here
   geom_label_repel(
@@ -1147,7 +1145,7 @@ plot4 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color
     box.padding = unit(1, "lines"),
     point.padding = unit(0.5, "lines"),
     size = 2.5,
-    color = "black", # Text color
+    color = "blue", # Text color
     fill = "white", # Background color of the label
     segment.color = NA) + # No line segment needed here
   #annotate("text", label = "R^2 = 0.197", x = 2200, y = -2300, size = 2, color = "black", parse = T)+
@@ -1168,7 +1166,6 @@ ggsave("../output/GO_MWU/HighvMid_MidvControl_DeltaRank_boxlabel.pdf", plot = pl
 ggsave("../output/GO_MWU/HighvMid_MidvControl_DeltaRank_boxlabel.png", plot = plot, width = 35, height = 15, units = "cm")
 ```
 
-
 Plot all the things 
 ```{r}
 plot_all <- plot_grid(plot1, plot2, plot3, plot4, labels = c('A', 'B', 'C', 'D'), nrow = 2, ncol = 2)
@@ -1177,44 +1174,26 @@ ggsave("../output/GO_MWU/DeltaRank_boxlabel.pdf", plot = plot_all, width = 40, h
 ggsave("../output/GO_MWU/DeltaRank_boxlabel.png", plot = plot_all, width = 40, height = 25, units = "cm")
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-Rank regression model - similar to linear regression but with no assumptions of normality or equal variance. It instead replaces the original data values with their corresponding ranks. This is more robust to outliers because it gives equal weight to all data regardless of magnitude
+Bind all dfs into one df and save for supplementary table
 ```{r}
-# Create the rank regression model
-x_rank <- rank(ress_filt$delta.rank.x)
-y_rank <- rank(ress_filt$delta.rank.y)
+# Add extra columns for ontology and comparisons 
+bp_hvc$comparison <- "High_v_Control"
+bp_hvc$ontology <- "Biological Processes"
+mf_hvc$comparison <- "High_v_Control"
+mf_hvc$ontology <- "Molecular Functions"
 
-rank_model <- lm(y_rank ~ x_rank)
+bp_hvm$comparison <- "High_v_Mid"
+bp_hvm$ontology <- "Biological Processes"
+mf_hvm$comparison <- "High_v_Mid"
+mf_hvm$ontology <- "Molecular Functions"
 
-# Look at the summary of the model
-summary(rank_model)
+bp_mvc$comparison <- "Mid_v_Control"
+bp_mvc$ontology <- "Biological Processes"
+mf_mvc$comparison <- "Mid_v_Control"
+mf_mvc$ontology <- "Molecular Functions"
 
-# Create a scatter plot of the ranked data
-plot(x_rank, y_rank, main="Rank Regression: Delta Rank Y vs Delta Rank X",
-     xlab="Rank of Delta Rank X", ylab="Rank of Delta Rank Y")
-abline(rank_model, col="red")
-
-# OG data
-plot(ress_filt$delta.rank.x, ress_filt$delta.rank.y, 
-     main="Scatter Plot: Delta Rank Y vs Delta Rank X",
-     xlab="Delta Rank X", ylab="Delta Rank Y")
+# Bind and save 
+all_data <- rbind(bp_hvc, mf_hvc, bp_hvm, mf_hvm, bp_mvc, mf_mvc)
+write.csv(all_data, "../output/GO_MWU/goMWU_results.csv")
 ```
-
-Do we need to include this information in the paper?
-
-https://pmc.ncbi.nlm.nih.gov/articles/PMC4248265/ 
-
-
-
 
