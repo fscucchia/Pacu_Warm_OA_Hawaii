@@ -630,9 +630,31 @@ ress_filt <- ress %>%
 
 106 shared BP GO terms are < 0.01.
 
+Rank regression model - similar to linear regression but with no assumptions of normality or equal variance. It instead replaces the original data values with their corresponding ranks. This is more robust to outliers because it gives equal weight to all data regardless of magnitude
+```{r}
+# Create the rank regression model
+x_rank <- rank(ress_filt$delta.rank.x)
+y_rank <- rank(ress_filt$delta.rank.y)
+
+rank_model <- lm(y_rank ~ x_rank)
+
+# Look at the summary of the model
+summary(rank_model)
+
+# Create a scatter plot of the ranked data
+plot(x_rank, y_rank, main="Rank Regression: Delta Rank Y vs Delta Rank X",
+     xlab="Rank of Delta Rank X", ylab="Rank of Delta Rank Y")
+abline(rank_model, col="red")
+
+# OG data
+plot(ress_filt$delta.rank.x, ress_filt$delta.rank.y, 
+     main="Scatter Plot: Delta Rank Y vs Delta Rank X",
+     xlab="Delta Rank X", ylab="Delta Rank Y")
+```
+
 Create string for enriched delta ranks - these are the delta ranks that have the highest positive value in both comparisons 
 ```{r}
-enrich_list <- c("single strand break repair", "G-quadruplex DNA unwinding", "chromosome separation", "RNA and mRNA 3’-splice recognition")
+enrich_list <- c("single strand break repair", "G-quadruplex DNA unwinding", "V(D)J recombination", "negative regulation of telomere capping", "mRNA 3’-splice recognition")
 enrich_list_label <- paste(enrich_list, collapse = "\n")
 
 # Create a data frame for the label position
@@ -645,13 +667,13 @@ enrich_label_data <- data.frame(
 
 Create string for underrepresented delta ranks - these are the delta ranks that have the most negative value in both comparisons 
 ```{r}
-under_list <- c("lipoxygenase pathway", "axonemal dynein complex assembly", "long-chain fatty acid biosynthetic process", "fatty acid beta-oxidation", "NAD metabolic process")
+under_list <- c("lipoxygenase pathway", "axonemal dynein complex assembly", "long-chain fatty acid biosynthetic process", "cobalamin metabolic process", "fatty acid beta-oxidation", "NAD metabolic process")
 under_list_label <- paste(under_list, collapse = "\n")
 
 # Create a data frame for the label position
 under_label_data <- data.frame(
   x = -4100, # Adjust x position as needed
-  y = -800, # Adjust y position as needed
+  y = -600, # Adjust y position as needed
   label = under_list_label
 )
 ```
@@ -660,11 +682,10 @@ Color points to be labeled on plot
 ```{r}
 ress_filt <- ress_filt %>%
   mutate(include = case_when(
-    str_detect(name.x, "single strand break repair|G-quadruplex DNA unwinding|chromosome separation|RNA.*3'-splice.*recognition|mRNA.*3'-splice.*recognition") |
-    str_detect(name.y, "single strand break repair|G-quadruplex DNA unwinding|chromosome separation|RNA.*3'-splice.*recognition|mRNA.*3'-splice.*recognition") ~ "enriched",
-    
-    str_detect(name.x, "lipoxygenase pathway|axonemal dynein complex assembly|long-chain fatty acid biosynthetic process|fatty acid beta-oxidation|NAD metabolic process") |
-    str_detect(name.y, "lipoxygenase pathway|axonemal dynein complex assembly|long-chain fatty acid biosynthetic process|fatty acid beta-oxidation|NAD metabolic process") ~ "over",
+    str_detect(name.x, "single strand break repair|G-quadruplex DNA unwinding|V(D)J recombination|negative regulation of telomere capping|mRNA.*3'-splice.*recognition") |
+    str_detect(name.y, "single strand break repair|G-quadruplex DNA unwinding|V(D)J recombination|negative regulation of telomere capping|mRNA.*3'-splice.*recognition") ~ "enriched",
+    str_detect(name.x, "lipoxygenase pathway|axonemal dynein complex assembly|long-chain fatty acid biosynthetic process|fatty acid beta-oxidation|NAD metabolic process|cobalamin metabolic process") |
+    str_detect(name.y, "lipoxygenase pathway|axonemal dynein complex assembly|long-chain fatty acid biosynthetic process|fatty acid beta-oxidation|NAD metabolic process|cobalamin metabolic process") ~ "under",
     
     TRUE ~ NA_character_
   ))
@@ -690,6 +711,7 @@ plot1 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color
     size = 2.5,
     color = "black", # Text color
     fill = "white", # Background color of the label
+    label.border.color = "red",
     segment.color = NA) + # No line segment needed here
   geom_label_repel(
     data = under_label_data,
@@ -699,7 +721,10 @@ plot1 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color
     size = 2.5,
     color = "black", # Text color
     fill = "white", # Background color of the label
+    label.border.color = "blue",
     segment.color = NA) + # No line segment needed here
+  #annotate("text", label = "R^2 = 0.9702", x = 2200, y = -2300, size = 2, color = "black", parse = T)+
+  #annotate("text", label = "p < 0.001", x = 2200, y = -2500, size = 2, color = "black", parse = T)+
   theme(axis.text = element_text(size = 50),
         axis.title = element_text(size = 70)) +
   theme_cowplot(); plot1
@@ -746,15 +771,37 @@ ress_filt <- ress %>%
 
 28 shared MF GO terms are < 0.01.
 
+Rank regression model - similar to linear regression but with no assumptions of normality or equal variance. It instead replaces the original data values with their corresponding ranks. This is more robust to outliers because it gives equal weight to all data regardless of magnitude
+```{r}
+# Create the rank regression model
+x_rank <- rank(ress_filt$delta.rank.x)
+y_rank <- rank(ress_filt$delta.rank.y)
+
+rank_model <- lm(y_rank ~ x_rank)
+
+# Look at the summary of the model
+summary(rank_model)
+
+# Create a scatter plot of the ranked data
+plot(x_rank, y_rank, main="Rank Regression: Delta Rank Y vs Delta Rank X",
+     xlab="Rank of Delta Rank X", ylab="Rank of Delta Rank Y")
+abline(rank_model, col="red")
+
+# OG data
+plot(ress_filt$delta.rank.x, ress_filt$delta.rank.y, 
+     main="Scatter Plot: Delta Rank Y vs Delta Rank X",
+     xlab="Delta Rank X", ylab="Delta Rank Y")
+```
+
 Create string for enriched delta ranks - these are the delta ranks that have the highest positive value in both comparisons 
 ```{r}
-enrich_list <- c("single-stranded DNA helicase activity", "DNA phosphodiesterase activity", "histone kinase activity", "damaged DNA binding")
+enrich_list <- c("single-stranded DNA helicase activity", "DNA phosphodiesterase activity", "histone kinase activity", "single-stranded DNA binding", "DNA helicase activity")
 enrich_list_label <- paste(enrich_list, collapse = "\n")
 
 # Create a data frame for the label position
 enrich_label_data <- data.frame(
   x = 1000, # Adjust x position as needed
-  y = 3100, # Adjust y position as needed
+  y = 3300, # Adjust y position as needed
   label = enrich_list_label
 )
 ```
@@ -776,11 +823,10 @@ Color points to be labeled on plot
 ```{r}
 ress_filt <- ress_filt %>%
   mutate(include = case_when(
-    str_detect(name.x, "single-stranded DNA helicase activity|DNA phosphodiesterase activity|histone kinase activity|damaged DNA binding") |
-    str_detect(name.y, "single-stranded DNA helicase activity|DNA phosphodiesterase activity|histone kinase activity|damaged DNA binding") ~ "enriched",
-    
+    str_detect(name.x, "single-stranded DNA helicase activity|DNA phosphodiesterase activity|histone kinase activity|single-stranded DNA binding|DNA helicase activity") |
+    str_detect(name.y, "single-stranded DNA helicase activity|DNA phosphodiesterase activity|histone kinase activity|single-stranded DNA binding|DNA helicase activity") ~ "enriched",
     str_detect(name.x, "oxidoreductase activity|oxidoreductase activity, acting on single donors with incorporation of molecular oxygen") |
-    str_detect(name.y, "oxidoreductase activity|oxidoreductase activity, acting on single donors with incorporation of molecular oxygen") ~ "over",
+    str_detect(name.y, "oxidoreductase activity|oxidoreductase activity, acting on single donors with incorporation of molecular oxygen") ~ "under",
     
     TRUE ~ NA_character_
   ))
@@ -816,6 +862,8 @@ plot2 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color
     color = "black", # Text color
     fill = "white", # Background color of the label
     segment.color = NA) + # No line segment needed here
+  #annotate("text", label = "R^2 = 0.8884", x = 2200, y = -2300, size = 2, color = "black", parse = T)+
+  #annotate("text", label = "p < 0.001", x = 2200, y = -2500, size = 2, color = "black", parse = T)+
   theme(axis.text = element_text(size = 50),
         axis.title = element_text(size = 70)) +
   theme_cowplot(); plot2
@@ -833,7 +881,312 @@ ggsave("../output/GO_MWU/HighvMid_HighvControl_DeltaRank_boxlabel.png", plot = p
 ```
 
 
-TO DO: make sure list of terms match those in manuscript, make other plots 
+## High v Control and Mid v Control
+
+#### Biological Processes 
+
+Read in BP data. 
+```{r}
+bp_hvc=read.table("GO_MWU/MWU_BP_DE_High_v_Control_LFC.csv",header=T)
+bp_mvc=read.table("GO_MWU/MWU_BP_DE_Mid_v_Control_LFC.csv",header=T)
+```
+
+Find terms in both sets and filter both sets by shared terms. 
+```{r}
+bp_good <- intersect(bp_hvc$term, bp_mvc$term)
+
+# Filter sets
+bp_hvc_filt <- bp_hvc[bp_hvc$term %in% bp_good,]
+bp_mvc_filt <- bp_mvc[bp_mvc$term %in% bp_good,]
+```
+
+There are 5729 shared GO terms between the High v Control and Mid v Control comparisons
+
+Combine sets 
+```{r}
+ress <- merge(bp_hvc_filt, bp_mvc_filt, by = "term")
+```
+
+The x is High v Control and the y is Mid v Control.
+
+Filter so that only p.adj < 0.01 for both sets
+```{r}
+ress_filt <- ress %>%
+  dplyr::filter(p.adj.x < 0.01) %>%
+  dplyr::filter(p.adj.y < 0.01) %>%
+  dplyr::filter(!grepl("obsolete", name.x))
+```
+
+99 shared BP GO terms are < 0.01.
+
+Rank regression model - similar to linear regression but with no assumptions of normality or equal variance. It instead replaces the original data values with their corresponding ranks. This is more robust to outliers because it gives equal weight to all data regardless of magnitude
+```{r}
+# Create the rank regression model
+x_rank <- rank(ress_filt$delta.rank.x)
+y_rank <- rank(ress_filt$delta.rank.y)
+
+rank_model <- lm(y_rank ~ x_rank)
+
+# Look at the summary of the model
+summary(rank_model)
+
+# Create a scatter plot of the ranked data
+plot(x_rank, y_rank, main="Rank Regression: Delta Rank Y vs Delta Rank X",
+     xlab="Rank of Delta Rank X", ylab="Rank of Delta Rank Y")
+abline(rank_model, col="red")
+
+# OG data
+plot(ress_filt$delta.rank.x, ress_filt$delta.rank.y, 
+     main="Scatter Plot: Delta Rank Y vs Delta Rank X",
+     xlab="Delta Rank X", ylab="Delta Rank Y")
+```
+
+Create string for enriched delta ranks - these are the delta ranks that have the highest positive value in both comparisons 
+```{r}
+enrich_list <- c("regulation of interferon-alpha production", "DNA-templated DNA replication maintenance of fidelity", "DNA replication initiation", "recombinational repair", "DNA recombination")
+enrich_list_label <- paste(enrich_list, collapse = "\n")
+
+# Create a data frame for the label position
+enrich_label_data <- data.frame(
+  x = 500, # Adjust x position as needed
+  y = 3100, # Adjust y position as needed
+  label = enrich_list_label
+)
+```
+
+Create string for underrepresented delta ranks - these are the delta ranks that have the most negative value in both comparisons 
+```{r}
+under_list <- c("mitochondrial ATP synthesis coupled electron transport", "oxidative phosphorylation", "electron transport chain", "cellular respiration", "generation of precursor metabolites and energy")
+under_list_label <- paste(under_list, collapse = "\n")
+
+# Create a data frame for the label position
+under_label_data <- data.frame(
+  x = -900, # Adjust x position as needed
+  y = -2000, # Adjust y position as needed
+  label = under_list_label
+)
+```
+
+Color points to be labeled on plot 
+```{r}
+ress_filt <- ress_filt %>%
+  mutate(include = case_when(
+    str_detect(name.x, "regulation of interferon-alpha production|DNA-templated DNA replication maintenance of fidelity|DNA replication initiation|recombinational repair|DNA recombination") |
+    str_detect(name.y, "regulation of interferon-alpha production|DNA-templated DNA replication maintenance of fidelity|DNA replication initiation|recombinational repair|DNA recombination") ~ "enriched",
+    str_detect(name.x, "mitochondrial ATP synthesis coupled electron transport|oxidative phosphorylation|electron transport chain|cellular respiration|generation of precursor metabolites and energy") |
+    str_detect(name.y, "mitochondrial ATP synthesis coupled electron transport|oxidative phosphorylation|electron transport chain|cellular respiration|generation of precursor metabolites and energy") ~ "under",
+    
+    TRUE ~ NA_character_
+  ))
+```
+
+Plot 
+```{r}
+# Plot
+plot3 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color = include)) +
+  geom_point(size = 2, show.legend = FALSE) +
+  scale_size("size") +
+  #scale_x_continuous(limits = c(-2500, 2000), breaks = seq(-2000, 2000, 1000)) +
+  #scale_y_continuous(limits = c(-2000, 2400), breaks = seq(-2000, 2000, 1000)) +
+  labs(x = "Delta Rank (High v. Control)", y = "Delta Rank (Mid v. Control)") +
+  geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.75) +
+  geom_hline(yintercept = 0, linetype = "dashed", alpha = 0.75) +
+  scale_color_manual(values = c("red", "blue", "black")) +
+  geom_label_repel(
+    data = enrich_label_data,
+    aes(x = x, y = y, label = label),
+    box.padding = unit(1, "lines"),
+    point.padding = unit(0.5, "lines"),
+    size = 2.5,
+    color = "black", # Text color
+    fill = "white", # Background color of the label
+    segment.color = NA) + # No line segment needed here
+  geom_label_repel(
+    data = under_label_data,
+    aes(x = x, y = y, label = label),
+    box.padding = unit(1, "lines"),
+    point.padding = unit(0.5, "lines"),
+    size = 2.5,
+    color = "black", # Text color
+    fill = "white", # Background color of the label
+    segment.color = NA) + # No line segment needed here
+  #annotate("text", label = "R^2 = 0.7201", x = 2200, y = -2300, size = 2, color = "black", parse = T)+
+  #annotate("text", label = "p < 0.001", x = 2200, y = -2500, size = 2, color = "black", parse = T)+
+  theme(axis.text = element_text(size = 50),
+        axis.title = element_text(size = 70)) +
+  theme_cowplot(); plot3
+
+ggsave("../output/GO_MWU/HighvControl_MidvControl_BP_DeltaRank_boxlabel.pdf", plot = plot3, width = 20, height = 15, units = "cm")
+ggsave("../output/GO_MWU/HighvControl_MidvControl_BP_DeltaRank_boxlabel.png", plot = plot3, width = 20, height = 15, units = "cm")
+```
+
+#### Molecular Function 
+
+Read in MF data. 
+```{r}
+mf_hvc=read.table("GO_MWU/MWU_MF_DE_High_v_Control_LFC.csv",header=T)
+mf_mvc=read.table("GO_MWU/MWU_MF_DE_Mid_v_Control_LFC.csv",header=T)
+```
+
+Find terms in both sets and filter both sets by shared terms. 
+```{r}
+mf_good <- intersect(mf_hvc$term, mf_mvc$term)
+
+# Filter sets
+mf_hvc_filt <- mf_hvc[mf_hvc$term %in% mf_good,]
+mf_mvc_filt <- mf_mvc[mf_mvc$term %in% mf_good,]
+```
+
+There are 1107 shared GO terms between the High v Control and Mid v Control comparisons
+
+Combine sets 
+```{r}
+ress <- merge(mf_hvc_filt, mf_mvc_filt, by = "term")
+```
+
+The x is High v Control and the y is Mid v Control  
+
+Filter so that only p.adj < 0.01 for both sets
+```{r}
+ress_filt <- ress %>%
+  dplyr::filter(p.adj.x < 0.01) %>%
+  dplyr::filter(p.adj.y < 0.01) %>%
+  dplyr::filter(!grepl("obsolete", name.x))
+```
+
+23 shared MF GO terms are < 0.01.
+
+Rank regression model - similar to linear regression but with no assumptions of normality or equal variance. It instead replaces the original data values with their corresponding ranks. This is more robust to outliers because it gives equal weight to all data regardless of magnitude
+```{r}
+# Create the rank regression model
+x_rank <- rank(ress_filt$delta.rank.x)
+y_rank <- rank(ress_filt$delta.rank.y)
+
+rank_model <- lm(y_rank ~ x_rank)
+
+# Look at the summary of the model
+summary(rank_model)
+
+# Create a scatter plot of the ranked data
+plot(x_rank, y_rank, main="Rank Regression: Delta Rank Y vs Delta Rank X",
+     xlab="Rank of Delta Rank X", ylab="Rank of Delta Rank Y")
+abline(rank_model, col="red")
+
+# OG data
+plot(ress_filt$delta.rank.x, ress_filt$delta.rank.y, 
+     main="Scatter Plot: Delta Rank Y vs Delta Rank X",
+     xlab="Delta Rank X", ylab="Delta Rank Y")
+```
+
+Even though the trend looks generally positive, the one point in the lower right quadrant is dragging down the R-squared value.
+
+Create string for enriched delta ranks - these are the delta ranks that have the highest positive value in both comparisons 
+```{r}
+enrich_list <- c("histone modifying activity", "histone binding", "DNA binding", "chromatin binding", "catalytic activity, acting on a nucleic acid")
+enrich_list_label <- paste(enrich_list, collapse = "\n")
+
+# Create a data frame for the label position
+enrich_label_data <- data.frame(
+  x = 500, # Adjust x position as needed
+  y = 2000, # Adjust y position as needed
+  label = enrich_list_label
+)
+```
+
+Create string for underrepresented delta ranks - these are the delta ranks that have the most negative value in both comparisons 
+```{r}
+under_list <- c("oxidoreduction-driven active transmembrane transporter activity", "electron transfer activity", "proton transmembrane transporter activity", "primary active transmembrane transporter activity", "organic anion transmembrane transporter activity")
+under_list_label <- paste(under_list, collapse = "\n")
+
+# Create a data frame for the label position
+under_label_data <- data.frame(
+  x = -500, # Adjust x position as needed
+  y = -2100, # Adjust y position as needed
+  label = under_list_label
+)
+```
+
+Color points to be labeled on plot 
+```{r}
+ress_filt <- ress_filt %>%
+  mutate(include = case_when(
+    str_detect(name.x, "histone modifying activity|histone binding|DNA binding|chromatin binding|	
+catalytic activity, acting on a nucleic acid") |
+    str_detect(name.y, "histone modifying activity|histone binding|DNA binding|chromatin binding|catalytic activity, acting on a nucleic acid") ~ "enriched",
+    str_detect(name.x, "oxidoreduction-driven active transmembrane transporter activity|electron transfer activity|proton transmembrane transporter activity|primary active transmembrane transporter activity|organic anion transmembrane transporter activity") |
+    str_detect(name.y, "oxidoreduction-driven active transmembrane transporter activity|electron transfer activity|proton transmembrane transporter activity|primary active transmembrane transporter activity|organic anion transmembrane transporter activity") ~ "under",
+    
+    TRUE ~ NA_character_
+  ))
+```
+
+Plot 
+```{r}
+# Plot
+plot4 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color = include)) +
+  geom_point(size = 2, show.legend = FALSE) +
+  scale_size("size") +
+  #scale_x_continuous(limits = c(-2500, 2000), breaks = seq(-2000, 2000, 1000)) +
+  #scale_y_continuous(limits = c(-2000, 2400), breaks = seq(-2000, 2000, 1000)) +
+  labs(x = "Delta Rank (High v. Control)", y = "Delta Rank (Mid v. Control)") +
+  geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.75) +
+  geom_hline(yintercept = 0, linetype = "dashed", alpha = 0.75) +
+  scale_color_manual(values = c("red", "blue", "black")) +
+  geom_label_repel(
+    data = enrich_label_data,
+    aes(x = x, y = y, label = label),
+    box.padding = unit(1, "lines"),
+    point.padding = unit(0.5, "lines"),
+    size = 2.5,
+    color = "black", # Text color
+    fill = "white", # Background color of the label
+    segment.color = NA) + # No line segment needed here
+  geom_label_repel(
+    data = under_label_data,
+    aes(x = x, y = y, label = label),
+    box.padding = unit(1, "lines"),
+    point.padding = unit(0.5, "lines"),
+    size = 2.5,
+    color = "black", # Text color
+    fill = "white", # Background color of the label
+    segment.color = NA) + # No line segment needed here
+  #annotate("text", label = "R^2 = 0.197", x = 2200, y = -2300, size = 2, color = "black", parse = T)+
+  #annotate("text", label = "p < 0.01", x = 2200, y = -2500, size = 2, color = "black", parse = T)+
+  theme(axis.text = element_text(size = 50),
+        axis.title = element_text(size = 70)) +
+  theme_cowplot(); plot4
+
+ggsave("../output/GO_MWU/HighvControl_MidvControl_MF_DeltaRank_boxlabel.pdf", plot = plot4, width = 20, height = 15, units = "cm")
+ggsave("../output/GO_MWU/HighvControl_MidvControl_MF_DeltaRank_boxlabel.png", plot = plot4, width = 20, height = 15, units = "cm")
+```
+
+Make plots into one figure and save 
+```{r}
+plot <- plot_grid(plot3, plot4, labels = c('A', 'B'))
+
+ggsave("../output/GO_MWU/HighvMid_MidvControl_DeltaRank_boxlabel.pdf", plot = plot, width = 35, height = 15, units = "cm")
+ggsave("../output/GO_MWU/HighvMid_MidvControl_DeltaRank_boxlabel.png", plot = plot, width = 35, height = 15, units = "cm")
+```
+
+
+Plot all the things 
+```{r}
+plot_all <- plot_grid(plot1, plot2, plot3, plot4, labels = c('A', 'B', 'C', 'D'), nrow = 2, ncol = 2)
+
+ggsave("../output/GO_MWU/DeltaRank_boxlabel.pdf", plot = plot_all, width = 40, height = 25, units = "cm")
+ggsave("../output/GO_MWU/DeltaRank_boxlabel.png", plot = plot_all, width = 40, height = 25, units = "cm")
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 Rank regression model - similar to linear regression but with no assumptions of normality or equal variance. It instead replaces the original data values with their corresponding ranks. This is more robust to outliers because it gives equal weight to all data regardless of magnitude
@@ -852,7 +1205,7 @@ plot(x_rank, y_rank, main="Rank Regression: Delta Rank Y vs Delta Rank X",
      xlab="Rank of Delta Rank X", ylab="Rank of Delta Rank Y")
 abline(rank_model, col="red")
 
-# To visualize the original data
+# OG data
 plot(ress_filt$delta.rank.x, ress_filt$delta.rank.y, 
      main="Scatter Plot: Delta Rank Y vs Delta Rank X",
      xlab="Delta Rank X", ylab="Delta Rank Y")
@@ -860,7 +1213,7 @@ plot(ress_filt$delta.rank.x, ress_filt$delta.rank.y,
 
 Do we need to include this information in the paper?
 
-
+https://pmc.ncbi.nlm.nih.gov/articles/PMC4248265/ 
 
 
 
