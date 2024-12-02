@@ -15,6 +15,7 @@ library(ggrepel)
 library(cowplot)
 library(kableExtra)
 library(BiocManager)
+library(patchwork)
 #library("GOSim")
 #library(rrvgo)
 #library(org.Ce.eg.db)
@@ -630,105 +631,56 @@ ress_filt <- ress %>%
 
 106 shared BP GO terms are < 0.01.
 
-Rank regression model - similar to linear regression but with no assumptions of normality or equal variance. It instead replaces the original data values with their corresponding ranks. This is more robust to outliers because it gives equal weight to all data regardless of magnitude
+Fit a linear model to find the slope 
 ```{r}
-# Create the rank regression model
-x_rank <- rank(ress_filt$delta.rank.x)
-y_rank <- rank(ress_filt$delta.rank.y)
+# Fit a linear model
+model <- lm(delta.rank.y ~ delta.rank.x, data = ress_filt)
 
-rank_model <- lm(y_rank ~ x_rank)
+# Extract the slope
+slope <- coef(model)[2]
 
-# Look at the summary of the model
-summary(rank_model)
-
-# Create a scatter plot of the ranked data
-plot(x_rank, y_rank, main="Rank Regression: Delta Rank Y vs Delta Rank X",
-     xlab="Rank of Delta Rank X", ylab="Rank of Delta Rank Y")
-abline(rank_model, col="red")
-
-# OG data
-plot(ress_filt$delta.rank.x, ress_filt$delta.rank.y, 
-     main="Scatter Plot: Delta Rank Y vs Delta Rank X",
-     xlab="Delta Rank X", ylab="Delta Rank Y")
-```
-
-Create string for enriched delta ranks - these are the delta ranks that have the highest positive value in both comparisons 
-```{r}
-enrich_list <- c("single strand break repair", "G-quadruplex DNA unwinding", "V(D)J recombination", "negative regulation of telomere capping", "mRNA 3’-splice recognition")
-enrich_list_label <- paste(enrich_list, collapse = "\n")
-
-# Create a data frame for the label position
-enrich_label_data <- data.frame(
-  x = 1000, # Adjust x position as needed
-  y = 3100, # Adjust y position as needed
-  label = enrich_list_label
-)
-```
-
-Create string for underrepresented delta ranks - these are the delta ranks that have the most negative value in both comparisons 
-```{r}
-under_list <- c("lipoxygenase pathway", "axonemal dynein complex assembly", "long-chain fatty acid biosynthetic process", "cobalamin metabolic process", "fatty acid beta-oxidation", "NAD metabolic process")
-under_list_label <- paste(under_list, collapse = "\n")
-
-# Create a data frame for the label position
-under_label_data <- data.frame(
-  x = -4100, # Adjust x position as needed
-  y = -600, # Adjust y position as needed
-  label = under_list_label
-)
-```
-
-Color points to be labeled on plot 
-```{r}
-ress_filt <- ress_filt %>%
-  mutate(include = case_when(
-    str_detect(name.x, "single strand break repair|G-quadruplex DNA unwinding|V\\(D\\)J recombination|negative regulation of telomere capping|mRNA.*3'-splice.*recognition") |
-    str_detect(name.y, "single strand break repair|G-quadruplex DNA unwinding|V\\(D\\)J recombination|negative regulation of telomere capping|mRNA.*3'-splice.*recognition") ~ "enriched",
-    str_detect(name.x, "lipoxygenase pathway|axonemal dynein complex assembly|long-chain fatty acid biosynthetic process|fatty acid beta-oxidation|NAD metabolic process|cobalamin metabolic process") |
-    str_detect(name.y, "lipoxygenase pathway|axonemal dynein complex assembly|long-chain fatty acid biosynthetic process|fatty acid beta-oxidation|NAD metabolic process|cobalamin metabolic process") ~ "under",
-    
-    TRUE ~ NA_character_
-  ))
+print(paste("The slope is:", round(slope, 4)))
 ```
 
 Plot 
 ```{r}
 # Plot
-plot1 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color = include)) +
+plot1 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y)) +
   geom_point(size = 2, show.legend = FALSE) +
   scale_size("size") +
-  #scale_x_continuous(limits = c(-2500, 2000), breaks = seq(-2000, 2000, 1000)) +
-  #scale_y_continuous(limits = c(-2000, 2400), breaks = seq(-2000, 2000, 1000)) +
+  scale_x_continuous(limits = c(-2700, 2700), breaks = seq(-2000, 2000, 1000)) +
+  scale_y_continuous(limits = c(-2700, 2700), breaks = seq(-2000, 2000, 1000)) +
   labs(x = "Delta Rank (High v. Control)", y = "Delta Rank (High v. Mid)") +
   geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.75) +
   geom_hline(yintercept = 0, linetype = "dashed", alpha = 0.75) +
-  scale_color_manual(values = c("red", "blue", "black")) +
-  geom_label_repel(
-    data = enrich_label_data,
-    aes(x = x, y = y, label = label),
-    box.padding = unit(1, "lines"),
-    point.padding = unit(0.5, "lines"),
-    size = 2.5,
-    color = "red", # Text color
-    fill = "white", # Background color of the label
-    segment.color = NA) + # No line segment needed here
-  geom_label_repel(
-    data = under_label_data,
-    aes(x = x, y = y, label = label),
-    box.padding = unit(1, "lines"),
-    point.padding = unit(0.5, "lines"),
-    size = 2.5,
-    color = "blue", # Text color
-    fill = "white", # Background color of the label
-    segment.color = NA) + # No line segment needed here
-  #annotate("text", label = "R^2 = 0.9702", x = 2200, y = -2300, size = 2, color = "black", parse = T)+
-  #annotate("text", label = "p < 0.001", x = 2200, y = -2500, size = 2, color = "black", parse = T)+
+  #scale_color_manual(values = c("red", "blue", "black")) +
+  # geom_label_repel(
+  #   data = enrich_label_data,
+  #   aes(x = x, y = y, label = label),
+  #   box.padding = unit(1, "lines"),
+  #   point.padding = unit(0.5, "lines"),
+  #   size = 2.5,
+  #   color = "red", # Text color
+  #   fill = "white", # Background color of the label
+  #   segment.color = NA) + # No line segment needed here
+  # geom_label_repel(
+  #   data = under_label_data,
+  #   aes(x = x, y = y, label = label),
+  #   box.padding = unit(1, "lines"),
+  #   point.padding = unit(0.5, "lines"),
+  #   size = 2.5,
+  #   color = "blue", # Text color
+  #   fill = "white", # Background color of the label
+  #   segment.color = NA) + # No line segment needed here
+  annotate("label", label = "Overrepresented in High", x = 500, y = 2200, size = 4, color = "black")+
+  annotate("label", label = "Underrepresented in High", x = -2100, y = -800, size = 4, color = "black")+
+  annotate("text", label = paste("Slope:", round(slope, 2)), x = 2300, y = -2300, size = 3, color = "black") +
   theme(axis.text = element_text(size = 50),
         axis.title = element_text(size = 70)) +
   theme_cowplot(); plot1
 
-ggsave("../output/GO_MWU/HighvControl_HighvMid_BP_DeltaRank_boxlabel.pdf", plot = plot1, width = 20, height = 15, units = "cm")
-ggsave("../output/GO_MWU/HighvControl_HighvMid_BP_DeltaRank_boxlabel.png", plot = plot1, width = 20, height = 15, units = "cm")
+ggsave("../output/GO_MWU/HighvControl_HighvMid_BP_DeltaRank.pdf", plot = plot1, width = 20, height = 15, units = "cm")
+ggsave("../output/GO_MWU/HighvControl_HighvMid_BP_DeltaRank.png", plot = plot1, width = 20, height = 15, units = "cm")
 ```
 
 
@@ -769,113 +721,64 @@ ress_filt <- ress %>%
 
 28 shared MF GO terms are < 0.01.
 
-Rank regression model - similar to linear regression but with no assumptions of normality or equal variance. It instead replaces the original data values with their corresponding ranks. This is more robust to outliers because it gives equal weight to all data regardless of magnitude
+Fit a linear model to find the slope 
 ```{r}
-# Create the rank regression model
-x_rank <- rank(ress_filt$delta.rank.x)
-y_rank <- rank(ress_filt$delta.rank.y)
+# Fit a linear model
+model <- lm(delta.rank.y ~ delta.rank.x, data = ress_filt)
 
-rank_model <- lm(y_rank ~ x_rank)
+# Extract the slope
+slope <- coef(model)[2]
 
-# Look at the summary of the model
-summary(rank_model)
-
-# Create a scatter plot of the ranked data
-plot(x_rank, y_rank, main="Rank Regression: Delta Rank Y vs Delta Rank X",
-     xlab="Rank of Delta Rank X", ylab="Rank of Delta Rank Y")
-abline(rank_model, col="red")
-
-# OG data
-plot(ress_filt$delta.rank.x, ress_filt$delta.rank.y, 
-     main="Scatter Plot: Delta Rank Y vs Delta Rank X",
-     xlab="Delta Rank X", ylab="Delta Rank Y")
-```
-
-Create string for enriched delta ranks - these are the delta ranks that have the highest positive value in both comparisons 
-```{r}
-enrich_list <- c("single-stranded DNA helicase activity", "DNA phosphodiesterase activity", "histone kinase activity", "single-stranded DNA binding", "DNA helicase activity")
-enrich_list_label <- paste(enrich_list, collapse = "\n")
-
-# Create a data frame for the label position
-enrich_label_data <- data.frame(
-  x = 1000, # Adjust x position as needed
-  y = 3300, # Adjust y position as needed
-  label = enrich_list_label
-)
-```
-
-Create string for underrepresented delta ranks - these are the delta ranks that have the most negative value in both comparisons 
-```{r}
-under_list <- c("oxidoreductase activity", "oxidoreductase activity, acting on single donors with incorporation of molecular oxygen")
-under_list_label <- paste(under_list, collapse = "\n")
-
-# Create a data frame for the label position
-under_label_data <- data.frame(
-  x = -3500, # Adjust x position as needed
-  y = -1000, # Adjust y position as needed
-  label = under_list_label
-)
-```
-
-Color points to be labeled on plot 
-```{r}
-ress_filt <- ress_filt %>%
-  mutate(include = case_when(
-    str_detect(name.x, "single-stranded DNA helicase activity|DNA phosphodiesterase activity|histone kinase activity|single-stranded DNA binding|DNA helicase activity") |
-    str_detect(name.y, "single-stranded DNA helicase activity|DNA phosphodiesterase activity|histone kinase activity|single-stranded DNA binding|DNA helicase activity") ~ "enriched",
-    str_detect(name.x, "oxidoreductase activity|oxidoreductase activity, acting on single donors with incorporation of molecular oxygen") |
-    str_detect(name.y, "oxidoreductase activity|oxidoreductase activity, acting on single donors with incorporation of molecular oxygen") ~ "under",
-    
-    TRUE ~ NA_character_
-  ))
+print(paste("The slope is:", round(slope, 4)))
 ```
 
 Plot 
 ```{r}
 # Plot
-plot2 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color = include)) +
+plot2 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y)) +
   geom_point(size = 2, show.legend = FALSE) +
   scale_size("size") +
-  #scale_x_continuous(limits = c(-2500, 2000), breaks = seq(-2000, 2000, 1000)) +
-  #scale_y_continuous(limits = c(-2000, 2400), breaks = seq(-2000, 2000, 1000)) +
+  scale_x_continuous(limits = c(-2700, 2700), breaks = seq(-2000, 2000, 1000)) +
+  scale_y_continuous(limits = c(-2700, 2700), breaks = seq(-2000, 2000, 1000)) +
   labs(x = "Delta Rank (High v. Control)", y = "Delta Rank (High v. Mid)") +
   geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.75) +
   geom_hline(yintercept = 0, linetype = "dashed", alpha = 0.75) +
   scale_color_manual(values = c("red", "blue", "black")) +
-  geom_label_repel(
-    data = enrich_label_data,
-    aes(x = x, y = y, label = label),
-    box.padding = unit(1, "lines"),
-    point.padding = unit(0.5, "lines"),
-    size = 2.5,
-    color = "red", # Text color
-    fill = "white", # Background color of the label
-    segment.color = NA) + # No line segment needed here
-  geom_label_repel(
-    data = under_label_data,
-    aes(x = x, y = y, label = label),
-    box.padding = unit(1, "lines"),
-    point.padding = unit(0.5, "lines"),
-    size = 2.5,
-    color = "blue", # Text color
-    fill = "white", # Background color of the label
-    segment.color = NA) + # No line segment needed here
-  #annotate("text", label = "R^2 = 0.8884", x = 2200, y = -2300, size = 2, color = "black", parse = T)+
-  #annotate("text", label = "p < 0.001", x = 2200, y = -2500, size = 2, color = "black", parse = T)+
+  # geom_label_repel(
+  #   data = enrich_label_data,
+  #   aes(x = x, y = y, label = label),
+  #   box.padding = unit(1, "lines"),
+  #   point.padding = unit(0.5, "lines"),
+  #   size = 2.5,
+  #   color = "red", # Text color
+  #   fill = "white", # Background color of the label
+  #   segment.color = NA) + # No line segment needed here
+  # geom_label_repel(
+  #   data = under_label_data,
+  #   aes(x = x, y = y, label = label),
+  #   box.padding = unit(1, "lines"),
+  #   point.padding = unit(0.5, "lines"),
+  #   size = 2.5,
+  #   color = "blue", # Text color
+  #   fill = "white", # Background color of the label
+  #   segment.color = NA) + # No line segment needed here
+  annotate("label", label = "Enriched in High", x = 610, y = 2300, size = 4, color = "black")+
+  annotate("label", label = "Underrepresented in High", x = -1900, y = -900, size = 4, color = "black")+
+  annotate("text", label = paste("Slope:", round(slope, 2)), x = 2300, y = -2300, size = 3, color = "black") +
   theme(axis.text = element_text(size = 50),
         axis.title = element_text(size = 70)) +
   theme_cowplot(); plot2
 
-ggsave("../output/GO_MWU/HighvControl_HighvMid_MF_DeltaRank_boxlabel.pdf", plot = plot2, width = 20, height = 15, units = "cm")
-ggsave("../output/GO_MWU/HighvControl_HighvMid_MF_DeltaRank_boxlabel.png", plot = plot2, width = 20, height = 15, units = "cm")
+ggsave("../output/GO_MWU/HighvControl_HighvMid_MF_DeltaRank.pdf", plot = plot2, width = 20, height = 15, units = "cm")
+ggsave("../output/GO_MWU/HighvControl_HighvMid_MF_DeltaRank.png", plot = plot2, width = 20, height = 15, units = "cm")
 ```
 
 Make plots into one figure and save 
 ```{r}
 plot <- plot_grid(plot1, plot2, labels = c('A', 'B'))
 
-ggsave("../output/GO_MWU/HighvMid_HighvControl_DeltaRank_boxlabel.pdf", plot = plot, width = 35, height = 15, units = "cm")
-ggsave("../output/GO_MWU/HighvMid_HighvControl_DeltaRank_boxlabel.png", plot = plot, width = 35, height = 15, units = "cm")
+ggsave("../output/GO_MWU/HighvMid_HighvControl_DeltaRank.pdf", plot = plot, width = 35, height = 15, units = "cm")
+ggsave("../output/GO_MWU/HighvMid_HighvControl_DeltaRank.png", plot = plot, width = 35, height = 15, units = "cm")
 ```
 
 
@@ -917,105 +820,56 @@ ress_filt <- ress %>%
 
 99 shared BP GO terms are < 0.01.
 
-Rank regression model - similar to linear regression but with no assumptions of normality or equal variance. It instead replaces the original data values with their corresponding ranks. This is more robust to outliers because it gives equal weight to all data regardless of magnitude
+Fit a linear model to find the slope 
 ```{r}
-# Create the rank regression model
-x_rank <- rank(ress_filt$delta.rank.x)
-y_rank <- rank(ress_filt$delta.rank.y)
+# Fit a linear model
+model <- lm(delta.rank.y ~ delta.rank.x, data = ress_filt)
 
-rank_model <- lm(y_rank ~ x_rank)
+# Extract the slope
+slope <- coef(model)[2]
 
-# Look at the summary of the model
-summary(rank_model)
-
-# Create a scatter plot of the ranked data
-plot(x_rank, y_rank, main="Rank Regression: Delta Rank Y vs Delta Rank X",
-     xlab="Rank of Delta Rank X", ylab="Rank of Delta Rank Y")
-abline(rank_model, col="red")
-
-# OG data
-plot(ress_filt$delta.rank.x, ress_filt$delta.rank.y, 
-     main="Scatter Plot: Delta Rank Y vs Delta Rank X",
-     xlab="Delta Rank X", ylab="Delta Rank Y")
-```
-
-Create string for enriched delta ranks - these are the delta ranks that have the highest positive value in both comparisons 
-```{r}
-enrich_list <- c("regulation of interferon-alpha production", "DNA-templated DNA replication maintenance of fidelity", "DNA replication initiation", "recombinational repair", "DNA recombination")
-enrich_list_label <- paste(enrich_list, collapse = "\n")
-
-# Create a data frame for the label position
-enrich_label_data <- data.frame(
-  x = 500, # Adjust x position as needed
-  y = 3100, # Adjust y position as needed
-  label = enrich_list_label
-)
-```
-
-Create string for underrepresented delta ranks - these are the delta ranks that have the most negative value in both comparisons 
-```{r}
-under_list <- c("mitochondrial ATP synthesis coupled electron transport", "oxidative phosphorylation", "electron transport chain", "cellular respiration", "generation of precursor metabolites and energy")
-under_list_label <- paste(under_list, collapse = "\n")
-
-# Create a data frame for the label position
-under_label_data <- data.frame(
-  x = -900, # Adjust x position as needed
-  y = -2000, # Adjust y position as needed
-  label = under_list_label
-)
-```
-
-Color points to be labeled on plot 
-```{r}
-ress_filt <- ress_filt %>%
-  mutate(include = case_when(
-    str_detect(name.x, "regulation of interferon-alpha production|DNA-templated DNA replication maintenance of fidelity|DNA replication initiation|recombinational repair|DNA recombination") |
-    str_detect(name.y, "regulation of interferon-alpha production|DNA-templated DNA replication maintenance of fidelity|DNA replication initiation|recombinational repair|DNA recombination") ~ "enriched",
-    str_detect(name.x, "mitochondrial ATP synthesis coupled electron transport|oxidative phosphorylation|electron transport chain|cellular respiration|generation of precursor metabolites and energy") |
-    str_detect(name.y, "mitochondrial ATP synthesis coupled electron transport|oxidative phosphorylation|electron transport chain|cellular respiration|generation of precursor metabolites and energy") ~ "under",
-    
-    TRUE ~ NA_character_
-  ))
+print(paste("The slope is:", round(slope, 4)))
 ```
 
 Plot 
 ```{r}
 # Plot
-plot3 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color = include)) +
+plot3 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y)) +
   geom_point(size = 2, show.legend = FALSE) +
   scale_size("size") +
-  #scale_x_continuous(limits = c(-2500, 2000), breaks = seq(-2000, 2000, 1000)) +
-  #scale_y_continuous(limits = c(-2000, 2400), breaks = seq(-2000, 2000, 1000)) +
+  scale_x_continuous(limits = c(-2700, 2700), breaks = seq(-2000, 2000, 1000)) +
+  scale_y_continuous(limits = c(-2700, 2700), breaks = seq(-2000, 2000, 1000)) +
   labs(x = "Delta Rank (High v. Control)", y = "Delta Rank (Mid v. Control)") +
   geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.75) +
   geom_hline(yintercept = 0, linetype = "dashed", alpha = 0.75) +
   scale_color_manual(values = c("red", "blue", "black")) +
-  geom_label_repel(
-    data = enrich_label_data,
-    aes(x = x, y = y, label = label),
-    box.padding = unit(1, "lines"),
-    point.padding = unit(0.5, "lines"),
-    size = 2.5,
-    color = "red", # Text color
-    fill = "white", # Background color of the label
-    segment.color = NA) + # No line segment needed here
-  geom_label_repel(
-    data = under_label_data,
-    aes(x = x, y = y, label = label),
-    box.padding = unit(1, "lines"),
-    point.padding = unit(0.5, "lines"),
-    size = 2.5,
-    color = "blue", # Text color
-    fill = "white", # Background color of the label
-    segment.color = NA) + # No line segment needed here
-  #annotate("text", label = "R^2 = 0.7201", x = 2200, y = -2300, size = 2, color = "black", parse = T)+
-  #annotate("text", label = "p < 0.001", x = 2200, y = -2500, size = 2, color = "black", parse = T)+
+  # geom_label_repel(
+  #   data = enrich_label_data,
+  #   aes(x = x, y = y, label = label),
+  #   box.padding = unit(1, "lines"),
+  #   point.padding = unit(0.5, "lines"),
+  #   size = 2.5,
+  #   color = "red", # Text color
+  #   fill = "white", # Background color of the label
+  #   segment.color = NA) + # No line segment needed here
+  # geom_label_repel(
+  #   data = under_label_data,
+  #   aes(x = x, y = y, label = label),
+  #   box.padding = unit(1, "lines"),
+  #   point.padding = unit(0.5, "lines"),
+  #   size = 2.5,
+  #   color = "blue", # Text color
+  #   fill = "white", # Background color of the label
+  #   segment.color = NA) + # No line segment needed here
+  annotate("label", label = "Enriched in High + Mid", x = 600, y = 2000, size = 4, color = "black")+
+  annotate("label", label = "Underrepresented in High + Mid", x = -1600, y = -2100, size = 4, color = "black")+
+  annotate("text", label = paste("Slope:", round(slope, 2)), x = 2300, y = -2300, size = 3, color = "black") +
   theme(axis.text = element_text(size = 50),
         axis.title = element_text(size = 70)) +
   theme_cowplot(); plot3
 
-ggsave("../output/GO_MWU/HighvControl_MidvControl_BP_DeltaRank_boxlabel.pdf", plot = plot3, width = 20, height = 15, units = "cm")
-ggsave("../output/GO_MWU/HighvControl_MidvControl_BP_DeltaRank_boxlabel.png", plot = plot3, width = 20, height = 15, units = "cm")
+ggsave("../output/GO_MWU/HighvControl_MidvControl_BP_DeltaRank.pdf", plot = plot3, width = 20, height = 15, units = "cm")
+ggsave("../output/GO_MWU/HighvControl_MidvControl_BP_DeltaRank.png", plot = plot3, width = 20, height = 15, units = "cm")
 ```
 
 #### Molecular Function 
@@ -1054,124 +908,79 @@ ress_filt <- ress %>%
 
 23 shared MF GO terms are < 0.01.
 
-Rank regression model - similar to linear regression but with no assumptions of normality or equal variance. It instead replaces the original data values with their corresponding ranks. This is more robust to outliers because it gives equal weight to all data regardless of magnitude
+Fit a linear model to find the slope 
 ```{r}
-# Create the rank regression model
-x_rank <- rank(ress_filt$delta.rank.x)
-y_rank <- rank(ress_filt$delta.rank.y)
+# Fit a linear model
+model <- lm(delta.rank.y ~ delta.rank.x, data = ress_filt)
 
-rank_model <- lm(y_rank ~ x_rank)
+# Extract the slope
+slope <- coef(model)[2]
 
-# Look at the summary of the model
-summary(rank_model)
-
-# Create a scatter plot of the ranked data
-plot(x_rank, y_rank, main="Rank Regression: Delta Rank Y vs Delta Rank X",
-     xlab="Rank of Delta Rank X", ylab="Rank of Delta Rank Y")
-abline(rank_model, col="red")
-
-# OG data
-plot(ress_filt$delta.rank.x, ress_filt$delta.rank.y, 
-     main="Scatter Plot: Delta Rank Y vs Delta Rank X",
-     xlab="Delta Rank X", ylab="Delta Rank Y")
-```
-
-Even though the trend looks generally positive, the one point in the lower right quadrant is dragging down the R-squared value.
-
-Create string for enriched delta ranks - these are the delta ranks that have the highest positive value in both comparisons 
-```{r}
-enrich_list <- c("histone modifying activity", "histone binding", "DNA binding", "chromatin binding", "catalytic activity, acting on a nucleic acid")
-enrich_list_label <- paste(enrich_list, collapse = "\n")
-
-# Create a data frame for the label position
-enrich_label_data <- data.frame(
-  x = 500, # Adjust x position as needed
-  y = 2000, # Adjust y position as needed
-  label = enrich_list_label
-)
-```
-
-Create string for underrepresented delta ranks - these are the delta ranks that have the most negative value in both comparisons 
-```{r}
-under_list <- c("oxidoreduction-driven active transmembrane transporter activity", "electron transfer activity", "proton transmembrane transporter activity", "primary active transmembrane transporter activity", "organic anion transmembrane transporter activity")
-under_list_label <- paste(under_list, collapse = "\n")
-
-# Create a data frame for the label position
-under_label_data <- data.frame(
-  x = -500, # Adjust x position as needed
-  y = -2100, # Adjust y position as needed
-  label = under_list_label
-)
-```
-
-Color points to be labeled on plot 
-```{r}
-ress_filt <- ress_filt %>%
-  mutate(include = case_when(
-    str_detect(name.x, "histone modifying activity|histone binding|DNA binding|chromatin binding|	
-catalytic activity, acting on a nucleic acid") |
-    str_detect(name.y, "histone modifying activity|histone binding|DNA binding|chromatin binding|catalytic activity, acting on a nucleic acid") ~ "enriched",
-    str_detect(name.x, "oxidoreduction-driven active transmembrane transporter activity|electron transfer activity|proton transmembrane transporter activity|primary active transmembrane transporter activity|organic anion transmembrane transporter activity") |
-    str_detect(name.y, "oxidoreduction-driven active transmembrane transporter activity|electron transfer activity|proton transmembrane transporter activity|primary active transmembrane transporter activity|organic anion transmembrane transporter activity") ~ "under",
-    
-    TRUE ~ NA_character_
-  ))
+print(paste("The slope is:", round(slope, 4)))
 ```
 
 Plot 
 ```{r}
 # Plot
-plot4 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color = include)) +
+plot4 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y)) +
   geom_point(size = 2, show.legend = FALSE) +
   scale_size("size") +
-  #scale_x_continuous(limits = c(-2500, 2000), breaks = seq(-2000, 2000, 1000)) +
-  #scale_y_continuous(limits = c(-2000, 2400), breaks = seq(-2000, 2000, 1000)) +
+  scale_x_continuous(limits = c(-2700, 2700), breaks = seq(-2000, 2000, 1000)) +
+  scale_y_continuous(limits = c(-2700, 2700), breaks = seq(-2000, 2000, 1000)) +
   labs(x = "Delta Rank (High v. Control)", y = "Delta Rank (Mid v. Control)") +
   geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.75) +
   geom_hline(yintercept = 0, linetype = "dashed", alpha = 0.75) +
   scale_color_manual(values = c("red", "blue", "black")) +
-  geom_label_repel(
-    data = enrich_label_data,
-    aes(x = x, y = y, label = label),
-    box.padding = unit(1, "lines"),
-    point.padding = unit(0.5, "lines"),
-    size = 2.5,
-    color = "red", # Text color
-    fill = "white", # Background color of the label
-    segment.color = NA) + # No line segment needed here
-  geom_label_repel(
-    data = under_label_data,
-    aes(x = x, y = y, label = label),
-    box.padding = unit(1, "lines"),
-    point.padding = unit(0.5, "lines"),
-    size = 2.5,
-    color = "blue", # Text color
-    fill = "white", # Background color of the label
-    segment.color = NA) + # No line segment needed here
-  #annotate("text", label = "R^2 = 0.197", x = 2200, y = -2300, size = 2, color = "black", parse = T)+
-  #annotate("text", label = "p < 0.01", x = 2200, y = -2500, size = 2, color = "black", parse = T)+
+  # geom_label_repel(
+  #   data = enrich_label_data,
+  #   aes(x = x, y = y, label = label),
+  #   box.padding = unit(1, "lines"),
+  #   point.padding = unit(0.5, "lines"),
+  #   size = 2.5,
+  #   color = "red", # Text color
+  #   fill = "white", # Background color of the label
+  #   segment.color = NA) + # No line segment needed here
+  # geom_label_repel(
+  #   data = under_label_data,
+  #   aes(x = x, y = y, label = label),
+  #   box.padding = unit(1, "lines"),
+  #   point.padding = unit(0.5, "lines"),
+  #   size = 2.5,
+  #   color = "blue", # Text color
+  #   fill = "white", # Background color of the label
+  #   segment.color = NA) + # No line segment needed here
+  annotate("label", label = "Overrepresented in High + Mid", x = 1500, y = 1700, size = 4, color = "black")+
+  annotate("label", label = "Underrepresented in High + Mid", x = -1600, y = -1650, size = 4, color = "black")+
+  annotate("text", label = paste("Slope:", round(slope, 2)), x = 2300, y = -2300, size = 3, color = "black") +
   theme(axis.text = element_text(size = 50),
         axis.title = element_text(size = 70)) +
   theme_cowplot(); plot4
 
-ggsave("../output/GO_MWU/HighvControl_MidvControl_MF_DeltaRank_boxlabel.pdf", plot = plot4, width = 20, height = 15, units = "cm")
-ggsave("../output/GO_MWU/HighvControl_MidvControl_MF_DeltaRank_boxlabel.png", plot = plot4, width = 20, height = 15, units = "cm")
+ggsave("../output/GO_MWU/HighvControl_MidvControl_MF_DeltaRank.pdf", plot = plot4, width = 20, height = 15, units = "cm")
+ggsave("../output/GO_MWU/HighvControl_MidvControl_MF_DeltaRank.png", plot = plot4, width = 20, height = 15, units = "cm")
 ```
 
 Make plots into one figure and save 
 ```{r}
 plot <- plot_grid(plot3, plot4, labels = c('A', 'B'))
 
-ggsave("../output/GO_MWU/HighvMid_MidvControl_DeltaRank_boxlabel.pdf", plot = plot, width = 35, height = 15, units = "cm")
-ggsave("../output/GO_MWU/HighvMid_MidvControl_DeltaRank_boxlabel.png", plot = plot, width = 35, height = 15, units = "cm")
+ggsave("../output/GO_MWU/HighvMid_MidvControl_DeltaRank.pdf", plot = plot, width = 35, height = 15, units = "cm")
+ggsave("../output/GO_MWU/HighvMid_MidvControl_DeltaRank.png", plot = plot, width = 35, height = 15, units = "cm")
 ```
 
 Plot all the things 
 ```{r}
-plot_all <- plot_grid(plot1, plot2, plot3, plot4, labels = c('A', 'B', 'C', 'D'), nrow = 2, ncol = 2)
+#plot_all <- plot_grid(plot1, plot2, plot3, plot4, labels = c('A', 'B', 'C', 'D'), nrow = 2, ncol = 2)
 
-ggsave("../output/GO_MWU/DeltaRank_boxlabel.pdf", plot = plot_all, width = 40, height = 25, units = "cm")
-ggsave("../output/GO_MWU/DeltaRank_boxlabel.png", plot = plot_all, width = 40, height = 25, units = "cm")
+plot_all <- (plot1 + plot2) / (plot3 + plot4) +
+  plot_annotation(tag_levels = 'A') +
+  plot_annotation(
+    title = "Biological Processes                                             Molecular Functions",
+    theme = theme(plot.title = element_text(size = 24, hjust = 0.5))
+  )
+
+ggsave("../output/GO_MWU/DeltaRank.pdf", plot = plot_all, width = 40, height = 25, units = "cm")
+ggsave("../output/GO_MWU/DeltaRank.png", plot = plot_all, width = 40, height = 25, units = "cm")
 ```
 
 Bind all dfs into one df and save for supplementary table
