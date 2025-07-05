@@ -117,24 +117,23 @@ ress_filt <- ress_filt %>%
   ))
 ```
 
-
 Plot 
 ```{r}
 # Plot
 plot1 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color = include)) +
   # Negative horizontal dashed line (blue)
-  geom_segment(aes(x = -Inf, xend = 0, y = 0, yend = 0), linetype = "dashed", alpha = 0.75, color = "blue") +
+  geom_segment(aes(x = -Inf, xend = 0, y = 0, yend = 0), linetype = "dashed", alpha = 0.95, size = 1, color = "blue") +
   
   # Positive horizontal dashed line (red)
-  geom_segment(aes(x = 0, xend = Inf, y = 0, yend = 0), linetype = "dashed", alpha = 0.75, color = "red") +
+  geom_segment(aes(x = 0, xend = Inf, y = 0, yend = 0), linetype = "dashed", alpha = 0.95, size = 1, color = "red") +
   
   # Negative vertical dashed line (blue)
-  geom_segment(aes(x = 0, xend = 0, y = -Inf, yend = 0), linetype = "dashed", alpha = 0.75, color = "blue") +
+  geom_segment(aes(x = 0, xend = 0, y = -Inf, yend = 0), linetype = "dashed", alpha = 0.95, size = 1, color = "blue") +
   
   # Positive vertical dashed line (red)
-  geom_segment(aes(x = 0, xend = 0, y = 0, yend = Inf), linetype = "dashed", alpha = 0.75, color = "red") +
+  geom_segment(aes(x = 0, xend = 0, y = 0, yend = Inf), linetype = "dashed", alpha = 0.95, size = 1, color = "red") +
   
-  geom_point(size = 2, show.legend = FALSE) +
+  geom_point(size = 4, show.legend = FALSE) +
   scale_size("size") +
   scale_x_continuous(limits = c(-3700, 3700), breaks = seq(-3000, 3000, 1000)) +
   scale_y_continuous(limits = c(-3700, 3700), breaks = seq(-3000, 3000, 1000)) +
@@ -160,16 +159,16 @@ plot1 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color
   #   color = "blue", # Text color
   #   fill = "white", # Background color of the label
   #   segment.color = NA) + # No line segment needed here
-  annotate("label", label = "Overrepresented in High", x = 500, y = 2200, size = 4, color = "red")+
-  annotate("label", label = "Underrepresented in High", x = -2100, y = -800, size = 4, color = "blue")+
-  annotate("text", label = paste("Slope:", round(slope_rank, 2)), x = 2300, y = -3600, size = 3, color = "black") +
+  theme_cowplot()+
+  annotate("label", label = "Overrepresented in High", x = 2600, y = 500, size = 7, color = "red", label.size = 0.8)+
+  annotate("label", label = "Underrepresented in High", x = -2600, y = -500, size = 7, color = "blue", label.size = 0.8)+
+  annotate("text", label = paste("Slope:", round(slope_rank, 2)), x = 2300, y = -3600, size = 6, color = "black") +
   #annotate("text", x = 700, y = 3100, label = "Overrepresented in High", size = 3, color = "red", face = "bold") +
-  theme(axis.text = element_text(size = 50),
-        axis.title = element_text(size = 70)) +
-  theme_cowplot(); plot1
+  theme(axis.text = element_text(size = 25),
+        axis.title = element_text(size = 35)); plot1
 
-ggsave("../output/GO_MWU/HighvControl_HighvMid_BP_DeltaRank.pdf", plot = plot1, width = 20, height = 15, units = "cm")
-ggsave("../output/GO_MWU/HighvControl_HighvMid_BP_DeltaRank.png", plot = plot1, width = 20, height = 15, units = "cm")
+ggsave("../output/GO_MWU/HighvControl_HighvMid_BP_DeltaRank.pdf", plot = plot1, width = 30, height = 25, units = "cm")
+ggsave("../output/GO_MWU/HighvControl_HighvMid_BP_DeltaRank.png", plot = plot1, width = 30, height = 25, units = "cm")
 ```
 
 

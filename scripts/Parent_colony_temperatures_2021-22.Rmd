@@ -1,0 +1,164 @@
+---
+title: "Temperature data 2021-22"
+author: "Jill Ashey"
+date: "2025-07-03"
+output: html_document
+---
+
+This script plots temperatures from June 2021 - July 2022 to provide information about the environmental history of the parent colonies. The data comes from [NOAA](https://www.ndbc.noaa.gov/station_history.php?station=mokh1) National Data Buoy Center - Station MOKH1 - 1612480 - Mokuoloe, HI. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(lubridate)
+library(tidyr)
+library(ggplot2)
+library(plotrix)
+library(tidyverse)
+library(dplyr)
+library(reshape2)
+library(gridExtra)
+library(FSA)
+library(naniar)
+library(cowplot)
+```
+
+Read in NOAA data 
+```{r}
+# Get a list of all text files in the folder
+file_list <- list.files("../Metadata/2021-22_temperature_data/", pattern = "\\.txt$", full.names = TRUE)
+
+data_list <- lapply(file_list, function(file) {
+  # Read file: no header, skip name + units rows
+  data <- read.table(
+    file,
+    header = FALSE,
+    sep = "",
+    skip = 2
+  )[, c(1:5, 15)]
+  
+  # Rename columns
+  colnames(data) <- c("Year", "Month", "Day", "Hour", "Minute", "WTMP")
+  
+  # Replace bad WTMP values with NA
+  data <- data %>%
+    replace_with_na(replace = list(WTMP = c("MM", "9   9.", ".0 999", "999", "0 999.")))
+  
+  # Convert to numeric
+  data$WTMP <- as.numeric(data$WTMP)
+  
+  # Create Date column (YYYY-MM-DD) with zero-padded Month & Day
+  data$Date <- as.Date(
+    paste(
+      data$Year,
+      sprintf("%02d", data$Month),
+      sprintf("%02d", data$Day),
+      sep = "-"
+    ),
+    format = "%Y-%m-%d"
+  )
+  return(data)
+})
+
+combined_data <- bind_rows(data_list)
+```
+
+Summarize WTMP by day
+```{r}
+daily_data <- combined_data %>%
+  group_by(Date) %>%
+  summarize(mean_WTMP = mean(WTMP), na.rm = TRUE)
+```
+
+Subset from July 2021 - July 2022 
+```{r}
+daily_data_sub <- daily_data %>%
+  filter(Date > "2021-07-01") %>%
+  filter(Date < "2022-07-30") 
+
+min(daily_data_sub$mean_WTMP)
+```
+
+Plot!
+```{r}
+temp_plot <- ggplot(daily_data_sub, aes(x = Date, y = mean_WTMP)) +
+  geom_line(color = "blue", size = 3) +
+    geom_segment(aes(x = as.Date("2022-06-11"), xend = as.Date("2022-06-11"), y = 23, yend = 28.5),
+               linetype = "dashed", color = "black", size = 1.5) +
+  geom_segment(aes(x = as.Date("2022-07-10"), xend = as.Date("2022-07-10"), y = 23, yend = 28.5),
+               linetype = "dashed", color = "black", size = 1.5) +
+  #annotate("text", x = as.Date("2022-06-11"), y = 28.6, label = "Parent colonies collected", angle = 45, hjust = 0, size = 6.5) + 
+  #annotate("text", x = as.Date("2022-07-10"), y = 28.6, label = "Larvae released", angle = 45, hjust = 0, size = 6.5) + 
+  scale_x_date(
+    date_breaks = "1 month",
+    date_labels = "%b %Y") +
+  theme_classic()+
+  ylab("Temperature (°C)")+
+  xlab("")+
+  theme_classic()+
+  theme(legend.title = element_text(size = 28, face = "bold"),
+          legend.text = element_text(size = 25),
+          legend.position = c(0.95, 0.95),
+          legend.justification = c("right", "top")) +
+  theme(#plot.margin = margin(t = 2, r = 2, b = 2, l = 2, unit = "cm"),
+        axis.ticks = element_line(size = 1, color = "black"),
+        axis.ticks.length = unit(0.3, "cm"),
+        axis.text.x = element_text(size = 30,
+                                   color = "black",
+                                   angle = 45, 
+                                   hjust = 1), 
+        axis.text.y = element_text(size = 30,
+                                   color = "black"),
+        axis.title.y = element_text(size = 35,
+                                    face = "bold",
+                                    margin = margin(t = 100, r = 20, b = 20, l = 20, unit = "pt"))); temp_plot 
+
+```
+
+Plot variation across 24 hours
+```{r}
+# Subset by date
+combined_data_sub <- combined_data %>%
+  filter(Date > "2021-07-01") %>%
+  filter(Date < "2022-07-30") 
+  
+diurnal_data <- combined_data_sub %>%
+  group_by(Hour, Minute) %>%
+  summarize(mean_WTMP = mean(WTMP, na.rm = TRUE)) %>%
+  mutate(
+    TimeDecimal = Hour + Minute / 60  # for continuous x-axis
+  )
+
+day_plot <- ggplot(diurnal_data, aes(x = TimeDecimal, y = mean_WTMP)) +
+  geom_line(color = "blue", size = 3) +
+  scale_x_continuous(breaks = seq(0, 24, by = 2)) +
+  ylab("Temperature (°C)")+
+  xlab("")+
+  theme_classic()+
+  theme(legend.title = element_text(size = 28, face = "bold"),
+          legend.text = element_text(size = 25),
+          legend.position = c(0.95, 0.95),
+          legend.justification = c("right", "top")) +
+  theme(axis.ticks = element_line(size = 1, color = "black"),
+        axis.ticks.length = unit(0.3, "cm"),
+        axis.text.x = element_text(size = 30,
+                                   color = "black",
+                                   hjust = 1), 
+        axis.text.y = element_text(size = 30,
+                                   color = "black"),
+        axis.title.y = element_text(size = 35,
+                                    face = "bold",
+                                    margin = margin(t = 100, r = 20, b = 20, l = 20, unit = "pt"))); day_plot
+```
+
+Combine both plots and save 
+```{r}
+combined_plot <- plot_grid(temp_plot, day_plot,
+  labels = c("A", "B"),
+  label_size = 40,
+  ncol = 2); combined_plot
+
+ggsave("../output/CarbChem/NOAA_parent_colony_temps.png", combined_plot, width=30, height=10)
+ggsave("../output/CarbChem/NOAA_parent_colony_temps.pdf", combined_plot, width=30, height=10)
+```
+
