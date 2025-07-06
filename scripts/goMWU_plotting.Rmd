@@ -160,12 +160,12 @@ plot1 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color
   #   fill = "white", # Background color of the label
   #   segment.color = NA) + # No line segment needed here
   theme_cowplot()+
-  annotate("label", label = "Overrepresented in High", x = 2600, y = 500, size = 7, color = "red", label.size = 0.8)+
-  annotate("label", label = "Underrepresented in High", x = -2600, y = -500, size = 7, color = "blue", label.size = 0.8)+
+  annotate("label", label = "Overrepresented\nin High", x = 2600, y = 500, size = 7, color = "red", label.size = 0.8)+
+  annotate("label", label = "Underrepresented\nin High", x = -2600, y = -500, size = 7, color = "blue", label.size = 0.8)+
   annotate("text", label = paste("Slope:", round(slope_rank, 2)), x = 2300, y = -3600, size = 6, color = "black") +
   #annotate("text", x = 700, y = 3100, label = "Overrepresented in High", size = 3, color = "red", face = "bold") +
   theme(axis.text = element_text(size = 25),
-        axis.title = element_text(size = 35)); plot1
+        axis.title = element_text(size = 28)); plot1
 
 ggsave("../output/GO_MWU/HighvControl_HighvMid_BP_DeltaRank.pdf", plot = plot1, width = 30, height = 25, units = "cm")
 ggsave("../output/GO_MWU/HighvControl_HighvMid_BP_DeltaRank.png", plot = plot1, width = 30, height = 25, units = "cm")
@@ -271,18 +271,18 @@ Plot
 # Plot
 plot2 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color = include)) +
     # Negative horizontal dashed line (blue)
-  geom_segment(aes(x = -Inf, xend = 0, y = 0, yend = 0), linetype = "dashed", alpha = 0.75, color = "blue") +
+  geom_segment(aes(x = -Inf, xend = 0, y = 0, yend = 0), linetype = "dashed", alpha = 0.95, size = 1, color = "blue") +
   
   # Positive horizontal dashed line (red)
-  geom_segment(aes(x = 0, xend = Inf, y = 0, yend = 0), linetype = "dashed", alpha = 0.75, color = "red") +
+  geom_segment(aes(x = 0, xend = Inf, y = 0, yend = 0), linetype = "dashed", alpha = 0.95, size = 1, color = "red") +
   
   # Negative vertical dashed line (blue)
-  geom_segment(aes(x = 0, xend = 0, y = -Inf, yend = 0), linetype = "dashed", alpha = 0.75, color = "blue") +
+  geom_segment(aes(x = 0, xend = 0, y = -Inf, yend = 0), linetype = "dashed", alpha = 0.95, size = 1, color = "blue") +
   
   # Positive vertical dashed line (red)
-  geom_segment(aes(x = 0, xend = 0, y = 0, yend = Inf), linetype = "dashed", alpha = 0.75, color = "red") +
+  geom_segment(aes(x = 0, xend = 0, y = 0, yend = Inf), linetype = "dashed", alpha = 0.95, size = 1, color = "red") +
   
-  geom_point(size = 2, show.legend = FALSE) +
+  geom_point(size = 4, show.legend = FALSE) +
   scale_size("size") +
   scale_x_continuous(limits = c(-3700, 3700), breaks = seq(-3000, 3000, 1000)) +
   scale_y_continuous(limits = c(-3700, 3700), breaks = seq(-3000, 3000, 1000)) +
@@ -308,23 +308,23 @@ plot2 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color
   #   color = "blue", # Text color
   #   fill = "white", # Background color of the label
   #   segment.color = NA) + # No line segment needed here
-  annotate("label", label = "Overrepresented in High", x = 610, y = 2300, size = 4, color = "red")+
-  annotate("label", label = "Underrepresented in High", x = -1900, y = -900, size = 4, color = "blue")+
-  annotate("text", label = paste("Slope:", round(slope_rank, 2)), x = 2300, y = -3600, size = 3, color = "black") +
-  theme(axis.text = element_text(size = 50),
-        axis.title = element_text(size = 70)) +
-  theme_cowplot(); plot2
+  theme_cowplot() +
+  annotate("label", label = "Overrepresented\nin High", x = 2600, y = 500, size = 7, color = "red", label.size = 0.8)+
+  annotate("label", label = "Underrepresented\nin High", x = -2600, y = -500, size = 7, color = "blue", label.size = 0.8)+
+  annotate("text", label = paste("Slope:", round(slope_rank, 2)), x = 2300, y = -3600, size = 6, color = "black") +
+  theme(axis.text = element_text(size = 25),
+        axis.title = element_text(size = 28)); plot2
 
-ggsave("../output/GO_MWU/HighvControl_HighvMid_MF_DeltaRank.pdf", plot = plot2, width = 20, height = 15, units = "cm")
-ggsave("../output/GO_MWU/HighvControl_HighvMid_MF_DeltaRank.png", plot = plot2, width = 20, height = 15, units = "cm")
+ggsave("../output/GO_MWU/HighvControl_HighvMid_MF_DeltaRank.pdf", plot = plot2, width = 30, height = 25, units = "cm")
+ggsave("../output/GO_MWU/HighvControl_HighvMid_MF_DeltaRank.png", plot = plot2, width = 30, height = 25, units = "cm")
 ```
 
 Make plots into one figure and save 
 ```{r}
 plot <- plot_grid(plot1, plot2, labels = c('A', 'B'))
 
-ggsave("../output/GO_MWU/HighvMid_HighvControl_DeltaRank.pdf", plot = plot, width = 35, height = 15, units = "cm")
-ggsave("../output/GO_MWU/HighvMid_HighvControl_DeltaRank.png", plot = plot, width = 35, height = 15, units = "cm")
+ggsave("../output/GO_MWU/HighvMid_HighvControl_DeltaRank.pdf", plot = plot, width = 45, height = 15, units = "cm")
+ggsave("../output/GO_MWU/HighvMid_HighvControl_DeltaRank.png", plot = plot, width = 45, height = 15, units = "cm")
 ```
 
 
@@ -428,18 +428,18 @@ Plot
 # Plot
 plot3 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color = include)) +
     # Negative horizontal dashed line (blue)
-  geom_segment(aes(x = -Inf, xend = 0, y = 0, yend = 0), linetype = "dashed", alpha = 0.75, color = "blue") +
+  geom_segment(aes(x = -Inf, xend = 0, y = 0, yend = 0), linetype = "dashed", alpha = 0.95, size = 1, color = "blue") +
   
   # Positive horizontal dashed line (red)
-  geom_segment(aes(x = 0, xend = Inf, y = 0, yend = 0), linetype = "dashed", alpha = 0.75, color = "red") +
+  geom_segment(aes(x = 0, xend = Inf, y = 0, yend = 0), linetype = "dashed", alpha = 0.95, size = 1, color = "red") +
   
   # Negative vertical dashed line (blue)
-  geom_segment(aes(x = 0, xend = 0, y = -Inf, yend = 0), linetype = "dashed", alpha = 0.75, color = "blue") +
+  geom_segment(aes(x = 0, xend = 0, y = -Inf, yend = 0), linetype = "dashed", alpha = 0.95, size = 1, color = "blue") +
   
   # Positive vertical dashed line (red)
-  geom_segment(aes(x = 0, xend = 0, y = 0, yend = Inf), linetype = "dashed", alpha = 0.75, color = "red") +
+  geom_segment(aes(x = 0, xend = 0, y = 0, yend = Inf), linetype = "dashed", alpha = 0.95, size = 1, color = "red") +
   
-  geom_point(size = 2, show.legend = FALSE) +
+  geom_point(size = 4, show.legend = FALSE) +
   scale_size("size") +
   scale_x_continuous(limits = c(-3700, 3700), breaks = seq(-3000, 3000, 1000)) +
   scale_y_continuous(limits = c(-3700, 3700), breaks = seq(-3000, 3000, 1000)) +
@@ -465,15 +465,15 @@ plot3 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color
   #   color = "blue", # Text color
   #   fill = "white", # Background color of the label
   #   segment.color = NA) + # No line segment needed here
-  annotate("label", label = "Overrepresented in High + Mid", x = 600, y = 2000, size = 4, color = "red")+
-  annotate("label", label = "Underrepresented in High + Mid", x = -1600, y = -2100, size = 4, color = "blue")+
-  annotate("text", label = paste("Slope:", round(slope_rank, 2)), x = 2300, y = -3600, size = 3, color = "black") +
-  theme(axis.text = element_text(size = 50),
-        axis.title = element_text(size = 70)) +
-  theme_cowplot(); plot3
+  theme_cowplot() +
+  annotate("label", label = "Overrepresented\nin High + Mid", x = 2600, y = 500, size = 7, color = "red", label.size = 0.8)+
+  annotate("label", label = "Underrepresented\nin High + Mid", x = -2600, y = -500, size = 7, color = "blue", label.size = 0.8)+
+  annotate("text", label = paste("Slope:", round(slope_rank, 2)), x = 2300, y = -3600, size = 6, color = "black") +
+  theme(axis.text = element_text(size = 25),
+        axis.title = element_text(size = 28)); plot3
 
-ggsave("../output/GO_MWU/HighvControl_MidvControl_BP_DeltaRank.pdf", plot = plot3, width = 20, height = 15, units = "cm")
-ggsave("../output/GO_MWU/HighvControl_MidvControl_BP_DeltaRank.png", plot = plot3, width = 20, height = 15, units = "cm")
+ggsave("../output/GO_MWU/HighvControl_MidvControl_BP_DeltaRank.pdf", plot = plot3, width = 30, height = 25, units = "cm")
+ggsave("../output/GO_MWU/HighvControl_MidvControl_BP_DeltaRank.png", plot = plot3, width = 30, height = 25, units = "cm")
 ```
 
 #### Molecular Function 
@@ -576,18 +576,18 @@ Plot
 # Plot
 plot4 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color = include)) +
     # Negative horizontal dashed line (blue)
-  geom_segment(aes(x = -Inf, xend = 0, y = 0, yend = 0), linetype = "dashed", alpha = 0.75, color = "blue") +
+  geom_segment(aes(x = -Inf, xend = 0, y = 0, yend = 0), linetype = "dashed", alpha = 0.95, size = 1, color = "blue") +
   
   # Positive horizontal dashed line (red)
-  geom_segment(aes(x = 0, xend = Inf, y = 0, yend = 0), linetype = "dashed", alpha = 0.75, color = "red") +
+  geom_segment(aes(x = 0, xend = Inf, y = 0, yend = 0), linetype = "dashed", alpha = 0.95, size = 1, color = "red") +
   
   # Negative vertical dashed line (blue)
-  geom_segment(aes(x = 0, xend = 0, y = -Inf, yend = 0), linetype = "dashed", alpha = 0.75, color = "blue") +
+  geom_segment(aes(x = 0, xend = 0, y = -Inf, yend = 0), linetype = "dashed", alpha = 0.95, size = 1, color = "blue") +
   
   # Positive vertical dashed line (red)
-  geom_segment(aes(x = 0, xend = 0, y = 0, yend = Inf), linetype = "dashed", alpha = 0.75, color = "red") +
+  geom_segment(aes(x = 0, xend = 0, y = 0, yend = Inf), linetype = "dashed", alpha = 0.95, size = 1, color = "red") +
   
-  geom_point(size = 2, show.legend = FALSE) +
+  geom_point(size = 4, show.legend = FALSE) +
   scale_size("size") +
   scale_x_continuous(limits = c(-3700, 3700), breaks = seq(-3000, 3000, 1000)) +
   scale_y_continuous(limits = c(-3700, 3700), breaks = seq(-3000, 3000, 1000)) +
@@ -613,15 +613,15 @@ plot4 <- ggplot(ress_filt, aes(delta.rank.x, delta.rank.y, label = name.y, color
   #   color = "blue", # Text color
   #   fill = "white", # Background color of the label
   #  segment.color = NA) + # No line segment needed here
-  annotate("label", label = "Overrepresented in High + Mid", x = 1500, y = 1700, size = 4, color = "red")+
-  annotate("label", label = "Underrepresented in High + Mid", x = -1600, y = -1650, size = 4, color = "blue")+
-  annotate("text", label = paste("Slope:", round(slope_rank, 2)), x = 2300, y = -3600, size = 3, color = "black") +
-  theme(axis.text = element_text(size = 50),
-        axis.title = element_text(size = 70)) +
-  theme_cowplot(); plot4
+  theme_cowplot()+
+  annotate("label", label = "Overrepresented\nin High + Mid", x = 2600, y = 500, size = 7, color = "red", label.size = 0.8)+
+  annotate("label", label = "Underrepresented\nin High + Mid", x = -2600, y = -500, size = 7, color = "blue", label.size = 0.8)+
+  annotate("text", label = paste("Slope:", round(slope_rank, 2)), x = 2300, y = -3600, size = 6, color = "black") +
+  theme(axis.text = element_text(size = 25),
+        axis.title = element_text(size = 28)); plot4
 
-ggsave("../output/GO_MWU/HighvControl_MidvControl_MF_DeltaRank.pdf", plot = plot4, width = 20, height = 15, units = "cm")
-ggsave("../output/GO_MWU/HighvControl_MidvControl_MF_DeltaRank.png", plot = plot4, width = 20, height = 15, units = "cm")
+ggsave("../output/GO_MWU/HighvControl_MidvControl_MF_DeltaRank.pdf", plot = plot4, width = 30, height = 25, units = "cm")
+ggsave("../output/GO_MWU/HighvControl_MidvControl_MF_DeltaRank.png", plot = plot4, width = 30, height = 25, units = "cm")
 ```
 
 Make plots into one figure and save 
@@ -634,18 +634,41 @@ ggsave("../output/GO_MWU/HighvMid_MidvControl_DeltaRank.png", plot = plot, width
 
 Plot all the things 
 ```{r}
-#plot_all <- plot_grid(plot1, plot2, plot3, plot4, labels = c('A', 'B', 'C', 'D'), nrow = 2, ncol = 2)
-
-plot_all <- (plot1 + plot2) / (plot3 + plot4) +
-  plot_annotation(tag_levels = 'A') +
+patchwork <- (plot1 + plot2) / (plot3 + plot4)
+plot_all <- patchwork +
   plot_annotation(
-    title = "    Biological Processes                                                      Molecular Functions",
-    theme = theme(plot.title = element_text(size = 24, hjust = 0.5))
-  )
+    tag_levels = 'A',
+    title = " Biological Processes                                                                                         Molecular Functions",
+    theme = theme(
+      plot.title = element_text(size = 25, hjust = 0.5)
+    )
+  ) & 
+  theme(plot.tag = element_text(size = 30)); plot_all
 
-ggsave("../output/GO_MWU/DeltaRank.pdf", plot = plot_all, width = 40, height = 25, units = "cm")
-ggsave("../output/GO_MWU/DeltaRank.png", plot = plot_all, width = 40, height = 25, units = "cm")
+ggsave("../output/GO_MWU/DeltaRank.pdf", plot = plot_all, width = 58, height = 50, units = "cm")
+ggsave("../output/GO_MWU/DeltaRank.png", plot = plot_all, width = 58, height = 50, units = "cm")
 ```
+
+```{r}
+plot_all <- patchwork +
+  plot_annotation(
+    tag_levels = 'A',
+    title = " Biological Processes                                                                                         Molecular Functions",
+    theme = theme(
+      plot.title = element_text(size = 25, hjust = 0.5)
+    )
+  ) & 
+  theme(plot.tag = element_text(size = 60)); plot_all
+
+
+patchwork + 
+  plot_annotation(tag_levels = 'A') & 
+  theme(plot.tag = element_text(size = 50))
+```
+
+
+
+
 
 Bind all dfs into one df and save for supplementary table
 ```{r}
