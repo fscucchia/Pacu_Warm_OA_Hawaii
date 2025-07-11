@@ -726,7 +726,7 @@ anova(model)
 # 
 # ## Read in treatment information that assigns the loggers to a specific treatment
 # 
-# metadata <- read.csv("C:/Users/Federica/OneDrive - University of Florida/Documents/PhD related/Clean_workspace/Hawaii_2206/HOBO/HOBO-complete/metadata.csv", sep = ";")
+# metadata <- read.csv("............/metadata.csv", sep = ";")
 # #metadata$logger <- as.character(metadata$logger)
 # 
 # 
