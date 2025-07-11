@@ -1,7 +1,7 @@
 [![SRA](https://img.shields.io/badge/SRA-PRJNA1107956-blue)](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1107956/)  
 
 
-# A gradient of warming and acidification highlights physiological, molecular, and skeletal tolerance thresholds in _Pocillopora acuta_ recruits
+# Thermal and acidification gradients reveal tolerance thresholds in _Pocillopora acuta_ recruits
 ###### Jill Ashey¹, Federica Scucchia², Ariana Huffmyer<sup>1,3</sup>, Hollie M. Putnam¹, Tali Mass²
 
 ###### ¹University of Rhode Island, Department of Biological Sciences, Kingston, RI 02881, USA;                                                                                                               ²University of Haifa, Department of Marine Biology, Leon H. Charney School of Marine Sciences, Haifa, 3498838,  Israel;                                                                                      ³University of Washington, School for Aquatic and Fisheries Science, Seattle, WA 98195, USA
