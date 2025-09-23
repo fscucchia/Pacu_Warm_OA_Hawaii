@@ -21,6 +21,7 @@ library(wesanderson)
 library(cowplot)
 library(gridExtra)
 library(grid)
+library(patchwork)
 ```
 
 Load data. I'm going to use the transcript count matrix first, as that one appears to have most of the info from the gff (whereas the gene count matrix has STRG gene ids)
@@ -297,6 +298,21 @@ heatmap_degs <- pheatmap(mat, annotation_col=df, clustering_method = "average", 
 
 ggsave("../output/DEG/heatmap_DEGs.pdf", heatmap_degs, width = 8, height = 10)
 ggsave("../output/DEG/heatmap_DEGs.png", heatmap_degs, width = 8, height = 10)
+```
+
+Plot heatmap and PCA in one figure 
+```{r}
+heatmap_grob <- heatmap_degs$gtable   # if you assigned pheatmap() to heatmap_degs
+
+combined_plot <- plot_grid(
+  heatmap_grob, pca_plot_degs,
+  labels = c("A)", "B)"),
+  label_size = 16,
+  ncol = 2,
+  align = "h"); combined_plot
+
+ggsave("../output/DEG/heatmap_PCA_DEGs.png", plot = combined_plot, width = 40, height = 20, units = "cm", dpi = 700)
+ggsave("../figures/FIGURE_4.png", plot = combined_plot, width = 40, height = 20, units = "cm", dpi = 700)
 ```
 
 Volcano plots? Include?
