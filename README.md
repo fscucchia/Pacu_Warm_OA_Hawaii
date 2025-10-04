@@ -1,5 +1,5 @@
 [![SRA](https://img.shields.io/badge/SRA-PRJNA1107956-blue)](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1107956/)  
-
+[![DOI:10.1111/mec.70116](http://img.shields.io/badge/DOI-10.1111/mec.70116-blue)](https://doi.org/10.1111/mec.70116) 
 
 # Thermal and Acidification Gradients Reveal Tolerance Thresholds in _Pocillopora acuta_ Recruits
 ###### Jill Ashey¹, Federica Scucchia², Ariana Huffmyer<sup>1,3</sup>, Hollie M. Putnam¹, Tali Mass²
